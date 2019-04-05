@@ -1,0 +1,11 @@
+\section{Related Work}\label{sec:related-work}
+Chen et al.~\cite{CLSS2015} proposed validating the static binary translator
+LLBT~\cite{LLBT2012} and the hybid binary translator~\cite{LLVMDBT2012}, both
+translating ARM programs to LLVM IR,  using co-simulation testing on hardware,
+            i.e. the original binary code and the translated LLVM  code run
+            simultaneously on hardware and their architecture states are
+            compared.
+
+MeanDiff,~\cite{ASE2017} proposed a N-version IR testing to test three binary lifters, BAP~\cite{BAP:CAV11}, BINSEC~\cite{BINSEC2011}, and PyVEX~\cite{PYVEX} translating binary to BIL, DBA, and VEX IRs respectively), by symbolically executing each of the IR instances, lifted from a single machine instruction, to generate symbolic summaries to be compared sing a SAT solver. MeanDiff neither handle floating point operations, nor the instructions which does not manifest their side-effects (like flag updates) explicitly.
+
+Myreen et al.~\cite{Myreen:FMCAD:2008,Myreen:FMCAD:2012} proposed proof-producing decompilation where they translates a sequence of machine code to a tail-recursive function, which accurately describes the effect of the given machine code and hides irrelevant details of the underlying machine language specification.

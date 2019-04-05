@@ -1,12 +1,15 @@
-PAPER = prelim_proposal
+PAPER=prelim-doc
 
-TEX = $(wildcard *.tex)
+TEX = $(PAPER).tex \
+      abstract.tex \
+      related-work.tex
 
-BIB =
+BIB = $(wildcard bibs/*.bib)
 FIGS =
 
 .PHONY: all clean error-check
 
+#all: $(PAPER).pdf $(PAPER).pdf error-check
 all: $(PAPER).pdf error-check
 
 error-check: $(PAPER).pdf
@@ -19,11 +22,12 @@ error-check: $(PAPER).pdf
 	@echo "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
 	@echo ""
 
-$(PAPER).pdf: $(TEX) $(BIB) $(FIGS)
+$(PAPER).pdf: $(TEX) $(BIB)
+	pdflatex $(PAPER)
 	pdflatex $(PAPER)
 	bibtex $(PAPER)
 	pdflatex $(PAPER)
 	pdflatex $(PAPER)
 
 clean:
-	rm -f *.aux  ${PAPER}.bbl ${PAPER}.blg ${PAPER}.log ${PAPER}.out ${PAPER}.pdf comment.cut ${PAPER}.lof ${PAPER}.lot ${PAPER}.toc
+	rm -f *.aux  *.bbl *.blg *.log *.out ${PAPER}.pdf comment.cut ${PAPER}.lof ${PAPER}.lot ${PAPER}.toc
