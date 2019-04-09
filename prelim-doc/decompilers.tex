@@ -1,0 +1,20 @@
+\section{Decompilers: Facilitating Binary Analysis}\label{sec:decompilers}
+
+Despite the various challenges in analyzing machine code (Refer Section~\ref{sec:ba}), there has been
+impressive amount of work to rebuild a close approximation of the original source code from a
+compiled binary using various decompilation frameworks~\cite{McSema:Recon14,Remill,Angr1,BAP:CAV11,Radare2,FCD,BitBlaze:2008,hexray,Fokin:2011,eschulte2018bed,katz2018rnn,Schwartz:2013,IDA,mctoll,revgen}.
+
+Binary analysis using a decompilation framework is achieved by (1) Binary decompilation/lifting: Translating
+machine code to a intermediate representation (IR), which precisely represents
+the operational semantics of the binary code. The lifted IR exposes many
+high-level properties (like control flow, function boundary and prototype,
+    variable and their type etc.) of the the binary, which are otherwise lost
+during the compilation pipeline, and (2) performing the analysis at the IR
+level.  Analyzing the binary using the abstractions lifted to such high-level
+IR assist further analysis and/or optimization. We note that the IR, being the basis for any binary analysis techniques, the faithfulness of the lifting or decompilation process is highly desirable. 
+
+Binary analyzes are mostly agnostic to any specific high-level IR, but many
+projects~\cite{McSema:Recon14,Remill,FCD,reopt,mctoll} prefer to employ LLVM
+IR~\cite{Lattner:2004}. LLVM IR, being an industry standard compiler IR, enables many analyses and
+optimizations out-of-the-box which allows building a static binary analyzer
+with minimal effort.

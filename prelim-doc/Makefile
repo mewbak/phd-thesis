@@ -1,8 +1,6 @@
 PAPER=prelim-doc
 
-TEX = $(PAPER).tex \
-      abstract.tex \
-      related-work.tex
+TEX = $(wildcard *.tex)
 
 BIB = $(wildcard bibs/*.bib)
 FIGS =

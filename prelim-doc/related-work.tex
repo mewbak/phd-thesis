@@ -1,11 +1,78 @@
 \section{Related Work}\label{sec:related-work}
-Chen et al.~\cite{CLSS2015} proposed validating the static binary translator
+There have been many projects establishing the faithfulness of binary analysis, which we would elaborate in this section. Moreover, our approach borrows a number of ideas from previous work on equivalence checking \cite{}, translation validation~\cite{}, and software verification~\cite{},  which we will be briefed as well.
+
+\subsection{Translation Validation}
+
+The notion of a certifying compiler~\cite{Necula:2000,Pnueli:1998,Stepp:2011,Tristan:2011} is significantly easier to employ than a formal
+compiler verification~\cite{Leroy:2009},
+in part because it is generally easier
+to verify the correctness of the result of a computation
+than to prove the correctness of the computation itself. 
+
+~\cite{Pnueli:1998} proposed the idea of translation validation (TV) as a new approach to the verification of translators (compilers, code generators). The idea is: Rather than verifying the compiler itself, one constructs a validation tool which, after every run of the compiler, formally confirms that the target code produced in the run is a correct translation of the source program. One of the important ingredients  to set up the  translation validation process involve a formalization of the notion of ``correct implementation'' as a refinement relation. As proof method for the refinement, they employ a generalization of the well-established concept of simulation with refinement mapping~\cite{Abadi:1991}. Refinement mappings define a correspondence between the variables of a concrete system and the variables of an abstract system such that observations are preserved. 
+
+TV has been employed heavy in the field of compiler correctness~\cite{VOC2002,TVOC:CAV2005,Necula:2000}.
+~\cite{Necula:2000} proposed a technique where each of the original and the optimized programs is firstly evaluated symbolically
+into a series of mutually recursive function definitions. A basic block and variable correspondence is inferred by a scanning algorithm that traverses the function definitions.
+For example, when the scanning algorithm visits a branch condition \m{e} in the original
+program, it determines whether \m{e} is eliminated due to the optimizations. If it is eliminated, then the information collected is either \m{e = 0} or \m{¬e =0}, depending on which branch of \m{e} is preserved in the optimized program. 
+%
+If \m{e} is not eliminated, then it corresponds to another branch condition \m{e'} in the optimized program. The information collected is either \m{e = e'} or \m{e = ¬e'}, depending on the correspondence of \m{e}’s and \m{e'}’s branches. This shows that, besides symbolic evaluation, Necula’s technique has to
+solve some equalities to determine which branches are eliminated and also to determine
+the correspondence between branches in the two programs. Moreover, to find a basic
+block correspondence Necula’s technique uses some heuristics which are specific to the
+GNU C compiler.
+  
+Another translation validation technique is VOC [11].We overview VOC for struc-
+ture preserving transformations only. Such transformations admit a mapping between some program points in P and P?. In VOC a basic block and variable correspondence is represented by a mapping from some blocks in P? to some blocks in P, and also by a data abstraction. The domain and range of the block mapping form sets of control blocks. VOC chooses the first block of each loop body as a control block. The data abstraction is constructed as follows. For each block Bi in P?, and for every path from block Bj leading to Bi, a set of equalities v = V is computed, where v and V are vari- ables in P and P? respectively. The equalities are implied by invariants reaching Bj, transition system representing the path fromBj to Bi and its counterpart in P,and the current constructed data abstraction. This requires the implementation of VOC to use a
+prover to generate a data abstraction. Moreover, an implementation of VOC for Intel’s ORC compiler, VOC-64, tries the variable equalities for every pair of variables except for the temporaries introduced by the compiler. This trial is performed by scanning the symbol table produced by the compiler [2]. However, not every compiler provides the symbol table as a result of compilation, thus this limits the applicability of VOC-64.
+  
+A quite recent translation validation technique is Rival’s technique [9]. The tech-
+nique provides a unifying framework for the certification of compilation and of com- piled programs. Similarly to Necula’s technique, the framework is based on a symbolic representation of the semantics of the programs. Rival’s technique extracts basic block and variable correspondence from the standard debugging information if no optimiza- tions are applied. However, when some optimizations are involved in the compilation, the optimizing phase has to be instrumented further to debug the optimized code and generate the correspondence between the original and the optimized programs. One technique to automatically generate such a correspondence is due to Jaramillo et. al [4]. In this technique, the optimized programs initially starts as an identical copy of the orig- inal one, so that the mapping starts as an identity.As each transformation is applied, the mapping is changed to reflect the effects of the transformation. Thus, in this technique, one needs to know what and in which order the transformations are applied by the optimizing phase.  
+
+\subsection{Establishing faithfulness of Binary Analysis Tools}
+
+\paragraph{Using Simulation Testing}
+Martignoni et al.~\cite{Martignoni:ISSTA2009, Martignoni:ISSTA2010} attempted to leverage differential testing on QEMU~\cite{QEMU:USENIX05} and Bochs~\cite{Bochs1996}. Particularly, they compared the state between a physical and an emulated CPU after executing randomly chosen instructions on both to discover any semantic deviations. Although their technique can be applied to testing binary lifters, it is fundamentally limited because its effectiveness largely depends on randomly generated test cases. Typically, semantic bugs in binary lifters are triggered only with specific operand values. Therefore, a random test case generation does not help much in finding such bugs.
+
+Martignoni \etal~\cite{Martignoni:ASPLOS2012} uses symbolic execution on a Hi-Fi emulator~\cite{Bochs1996}, defined as an binary emulator which is more complete in terms of instructions coverage of IA-32 ISA and faithful, to generate high-quality test cases for a Lo-Fi emulator~\cite{QEMU:USENIX05}, defined as  less complete and buggier emulator. Symbolic analysis of the Hi-Fi emulator for a particular instruction extracts all the distinct behaviors and corner cases the emulator implements for that instruction. Such behaviors are then used to automatically generate  a test suite for the Lo-Fi emulator in order to  detect its deviations from the behavior of the Hi-Fi emulator. However, their approach does not consider the floating point instruction because the employed symbolic execution engine (FuzzBALL) does not support it. Also, the method can capture the deviations in the behavior of instructions implemented by both the emulators. Moreover, their technique relies on the X86 interpreter inside FuzzBALL. A bug in the later might effect the generation of high-fidelity test cases for a particular instruction, leading to incomplete coverage of the instruction's implementation in Low-Fi emulator.
+
+Chen \etal~\cite{CLSS2015} proposed validating the static binary translator
 LLBT~\cite{LLBT2012} and the hybid binary translator~\cite{LLVMDBT2012}, both
 translating ARM programs to LLVM IR,  using co-simulation testing on hardware,
             i.e. the original binary code and the translated LLVM  code run
             simultaneously on hardware and their architecture states are
             compared.
 
+Schwartz \etal~\cite{Schwartz:2013} proposed control flow structure recovery by employing semantics preveving schema and tested their binary to C decompiler, Phoenix, which is based on BAP~\cite{BAP:CAV11}, on a set of 107 real world programs from GNU coreutils. Along similar lines, 
+%
+Yakdan \etal~\cite{Yakdan2015NDSS} presented a decompiler, DREAM, to offer a goto-free output. DREAM uses a novel pattern independent control-flow structuring algorithm that can recover all control constructs in binary programs and produce structured decompiled code without any goto statement. The correctness of our algorithms is demonstrated using the GNU coreutils suite of utilities as a benchmark.
+
+Andriesse \etal~\cite{nucleus2017EuroSP} proposes a function detection algorithm, Nucleus, for binaries. The algorithm does not require function signature information or any learning phase. They evaluated Nucleus on a diverse set of $476$ C and C++ binaries, compiled with gcc, clang and Visual Studio for x86 and x64, at optimization levels O0--O3. 
+  
+\paragraph{Using Formal Methods}
 MeanDiff,~\cite{ASE2017} proposed a N-version IR testing to test three binary lifters, BAP~\cite{BAP:CAV11}, BINSEC~\cite{BINSEC2011}, and PyVEX~\cite{PYVEX} translating binary to BIL, DBA, and VEX IRs respectively), by symbolically executing each of the IR instances, lifted from a single machine instruction, to generate symbolic summaries to be compared sing a SAT solver. MeanDiff neither handle floating point operations, nor the instructions which does not manifest their side-effects (like flag updates) explicitly.
 
 Myreen et al.~\cite{Myreen:FMCAD:2008,Myreen:FMCAD:2012} proposed proof-producing decompilation where they translates a sequence of machine code to a tail-recursive function, which accurately describes the effect of the given machine code and hides irrelevant details of the underlying machine language specification.
+
+~\cite{inlineassm} addresses the challenge of designing and developing an automated, generic, trustable, and verification-oriented lifting technique turning inline assembly into semantically equivalent C code. By focusing on inline assembly rather than arbitrary decompilation, they tackle a problem both more restricted (simple control-flow, smaller size) and better defined (interfaces with C code, no dynamic jumps). Their idea goes by: (1) Compiling the source C code containing inline assembly to binary with debug information, where the assembly code is propagated as is, (2) lifting the output of 1 to an DBA IR using BINSEC~\cite{BINSEC2011}, (3) Lifting the assembly counterpart of the lifted IR at 2 to C, thereby augmenting the  source C code, (4) Recompiling the augmented C code to IR, and (5) translation validation of IRs at 2 and 4. This means that their work in basically validating the lifting of assembly code to C, not the translation of the binary to DBA IR, which is included in the trusted computing base. That lifting takes care of type reconstruction, register unpacking, structuring, predicate recovery. The float point operations are skipped because of the lack of support in BINSEC.   
+
+\paragraph{Using Machine Learning}
+~\cite{eschulte2018bed} leveraged a genetic optimization algorithm to infer source code from a binary. Given a target binary and an initial population with decompilation candidates, they  drive a genetic algorithm to improve the initial candidates, driving them closer to byte-equivalence w.r.t the target binary. The byte equivalence  is simply the edit distance to the target binary. This approach worked moderately well for smallish binaries: Out of $22$ binaries under test, only $3$ achieve full byte equivalence when the the initial population includes decompiler seeds, and $4$ achieve full byte equivalence when the initial population included decompilation candidates  from the HEX-RAYS~\cite{hexray} Decompiler. 
+
+\subsection{Equivalence Checking}
+With the ultimate goal of translation validation for optimizing compilers, ~\cite{Iman2005} proposed an algorithm for solving the problem of finding basic block and variable correspondence between two GCC RTL programs from the same source using different optimizations.
+ The essence of their technique is interpretation of the two programs on random inputs and comparing the histories of value changes for variables. If a variable \m{x1} in the original program have the same values as a variable \m{x2} in the optimized version at some control blocks for all possible runs of the two programs on the same input values, then they are defined as corresponding variables. However, the paper do not consider the VC generation from a given correspondence or proving the VCs. Moreover, the paper do not try to address any reordering transformation, that is any transformation that changes the order of execution of code, without adding or deleting any executions of any statement. Also, using random values results in poor code coverage which is detrimental to finding variable correspondence. We note that only the basic blocks \m{b1} and \m{b2}, which are covered by the same test input run in original and optimized versions respectively, can be the candidate for correspondence.     
+
+DDEC~\cite{DDEC:OOPSLA:2013} uses a combination of static analysis and data-driven inference for constructing simulation relations: Static analysis is used to determine the program locations of synchronization points and the live variables while the constraints between variables are inferred from execution traces.
+
+\subsection{Machine Learning-Assisted Binary Code Analysis}
+Jaffe \etal~\cite{Jaffe:2018ICPC} proposes a technique to assign meaningful variable names to decompiled C code by learning names that developers have assigned to code used in similar contexts. The technique aligns the variables in the decompiler output with those in the original C code in order to generate an aligned parallel corpus that is suitable for training a Statistical Machine Translation (SMT) model~\cite{Koehn:2007}.  
+
+Rosenblum \etal~\cite{Rosenblum2007,Rosenblum:2008,Bao:2014,Shin:2015} consider the machine learning problem of identifying function entry points in binaries where symbols indicating function location are stripped.
+%
+Rosenblum \etal~\cite{Rosenblum:2010} formulate compiler identification as a structured learning task, automatically building models that classify sequences of stripped binary code by the generating compiler.
+%
+Rosenblum \etal~\cite{Rosenblum:2011} developed authorship attribution technique that uses machine learning approach to automatically discover the stylistic characteristics of binary code which are indicative of programmer style.
+
+\subsection{Program Verification}

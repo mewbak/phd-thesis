@@ -1,0 +1,60 @@
+\section{Future Work}\label{sec:problem}
+
+We note that the faithfulness of the IR produced by the binary lifters, by
+translating the binary, is pivotal to any binary analysis built on top of it.
+Any bug in the translation would invalidate the binary analysis results. For
+example, a malware analysis system might give false alarms or a binary
+instrumentation system instrumenting a buggy IR might lead to failure or even
+crash in interpreting the instrumented program. 
+
+Given the importance of binary analysis, establishing the faithfulness of
+binary lifter (or decompilers) is most desirable, which is what we propose as
+our future work.
+
+Despite of the importance in establishing the faithfulness os the binary lifters,
+there has been surprisingly little effort towards that direction. 
+4 It
+is worth mentioning the work by Martignoni et al. [45] about test-case
+generation for 32-bit x86 ISA by symbolically executing the instruction
+implementations in bochs [40] binary emulator. However, floating-point
+instructions are excluded because the underlying symbolic execution engine
+does not support them.
+
+The most widely used approach in validating the binary lifters is based on random testing, where the translator is considered as a black-box. Most notable work along this line  is that of Martignoni et al.~\cite{Martignoni:ISSTA2009, Martignoni:ISSTA2010}, which
+ proposes differential testing on QEMU~\cite{QEMU:USENIX05} and Bochs~\cite{Bochs1996}.
+Specifically, they compared the state between a physical and an emulated CPU
+after executing randomly chosen instructions on both to discover any semantic
+deviations. In a related work, Martignoni \etal~\cite{Martignoni:ASPLOS2012} uses symbolic execution on a Hi-Fi emulator~\cite{Bochs1996}, defined as an binary emulator which is more complete in terms of instructions coverage of IA-32 ISA and faithful, to generate high-quality test cases to validate  a Lo-Fi emulator~\cite{QEMU:USENIX05}, defined as  less complete and buggier emulator. In both the above cases, validation works as follows: The binary and the lifted IR are executed independently, one on real hardware and the other on the emulator under test, and the output states are matched. Although, a simple and scalable approach, it's effectiveness is limited because many semantics bugs in binary lifters are triggered upon a specific input and exercising all such corner inputs is non-trivial. Note that, even though Martignoni \etal~\cite{Martignoni:ASPLOS2012} symbolically explored the test-cases which are supposed to covers all the paths of a given instruction's implementation, but being a differential testing-based approach, the faithfulness depends directly on  the faithfulness of the Hi-Fi emulator. A wrong implementation (or even omission of a particular case) of instruction semantics in the Hi-Fi, will lead to test-cases insufficient to explore all the paths and hence find bigs in the Low-Fi emulator. Moreover, their technique relies on the X86 the interpreter FuzzBALL. A bug in the later will effect the generation of high-fidelity test cases for a particular instruction, leading to incomplete coverage of the instruction's implementation in Low-Fi emulator. In summary, the test-based approach to validation the binary lifters are simple and scalable, but cannot be trusted to establish faithfulness.     
+
+Another direction to establish guarantees in the binary translation is by using formal methods. The most notable effort along the direction is the system  Meandiff, developed by Soomin \etal~\cite{ASE2017}.
+%
+MeanDiff proposed a N-version IR testing to test three binary lifters, BAP~\cite{BAP:CAV11}, BINSEC~\cite{BINSEC2011}, and PyVEX~\cite{PYVEX} translating binary to BIL, DBA, and VEX IRs respectively). The tools symbolically execute each of the IR instances, lifted from a single binary, to generate symbolic summaries to be compared using a SAT solver. MeanDiff neither handle floating point operations, nor the instructions which does not manifest their side-effects (like flag updates) explicitly. Moreover, MeanDiff reports a bug whenever a deviation is detected w.r.t the instruction-semantics-behavior in at least two binary lifters. But even if all the binary lifters are in sync on the behavior of a particular instruction, we cannot guarantee that all the lifters are faithful in lifting that instruction, which is however, a general limitation of differential testing based approach. Also, as MeanDiff is simultaneously testing multiple binary lifters , hence it cannot be used to establish the faithfulness in lifting the semantics of an instruction which is not implemented in one of the lifters. 
+
+Having said that, we formulated our problem statement as follows:
+
+\vspace{10pt}
+
+\noindent\textbf{Problem Statement}: \emph{Formally establishing the
+  faithfulness of state-of-the-art binary lifters without relying on random
+    testing}
+
+Next, we will discuss the challenges in the proposed work and the detailed
+steps that we envision to mitigate those.
+
+\section{Challenges}\label{sec:approach}
+
+One of the long standing challenge in engineering a faithful binary lifter is
+to comprehend the huge volume and complexity of instructions as specified in
+the Intel manual~\cite{IntelManual} with over $3,800$ pages written in an
+ad-hoc combination of English and pseudo-code. The \ISA ISA has a large number
+of instructions, partly because of a large number of complex instructions and
+partly because it keeps most of the legacy and deprecated instructions
+($~336$+) for the sake of backwards compatibility. It consists of $996$
+mnemonics, and each mnemonic admits several variants, depending on the types
+(i.e., register, memory, or constant) and the size (i.e., the bit-width) of
+operands. Moreover, the x86-64 reference manual informally explains the
+instruction behaviors, leaving certain details unspecified or ambiguous, which
+requires  to consult with an actual processor implementation to clarify such
+details. Completely formalizing the vast number of instructions with carefully
+identifying all the corner cases from the informal document, thus, is highly
+non-trivial.
