@@ -13,13 +13,7 @@ our future work.
 
 Despite of the importance in establishing the faithfulness os the binary lifters,
 there has been surprisingly little effort towards that direction. 
-4 It
-is worth mentioning the work by Martignoni et al. [45] about test-case
-generation for 32-bit x86 ISA by symbolically executing the instruction
-implementations in bochs [40] binary emulator. However, floating-point
-instructions are excluded because the underlying symbolic execution engine
-does not support them.
-
+%
 The most widely used approach in validating the binary lifters is based on random testing, where the translator is considered as a black-box. Most notable work along this line  is that of Martignoni et al.~\cite{Martignoni:ISSTA2009, Martignoni:ISSTA2010}, which
  proposes differential testing on QEMU~\cite{QEMU:USENIX05} and Bochs~\cite{Bochs1996}.
 Specifically, they compared the state between a physical and an emulated CPU
@@ -28,7 +22,10 @@ deviations. In a related work, Martignoni \etal~\cite{Martignoni:ASPLOS2012} use
 
 Another direction to establish guarantees in the binary translation is by using formal methods. The most notable effort along the direction is the system  Meandiff, developed by Soomin \etal~\cite{ASE2017}.
 %
-MeanDiff proposed a N-version IR testing to test three binary lifters, BAP~\cite{BAP:CAV11}, BINSEC~\cite{BINSEC2011}, and PyVEX~\cite{PYVEX} translating binary to BIL, DBA, and VEX IRs respectively). The tools symbolically execute each of the IR instances, lifted from a single binary, to generate symbolic summaries to be compared using a SAT solver. MeanDiff neither handle floating point operations, nor the instructions which does not manifest their side-effects (like flag updates) explicitly. Moreover, MeanDiff reports a bug whenever a deviation is detected w.r.t the instruction-semantics-behavior in at least two binary lifters. But even if all the binary lifters are in sync on the behavior of a particular instruction, we cannot guarantee that all the lifters are faithful in lifting that instruction, which is however, a general limitation of differential testing based approach. Also, as MeanDiff is simultaneously testing multiple binary lifters , hence it cannot be used to establish the faithfulness in lifting the semantics of an instruction which is not implemented in one of the lifters. 
+MeanDiff proposed a N-version IR testing to test three binary lifters, BAP~\cite{BAP:CAV11}, BINSEC~\cite{BINSEC2011}, and PyVEX~\cite{PYVEX} translating binary to BIL, DBA, and VEX IRs respectively). The tools symbolically execute each of the IR instances, lifted from a single binary, to generate symbolic summaries to be compared using a SAT solver. MeanDiff neither handle floating point operations, nor the instructions which does not manifest their side-effects (like flag updates) explicitly. Moreover, MeanDiff reports a bug whenever a deviation is detected w.r.t the instruction-semantics-behavior in at least two binary lifters. But even if all the binary lifters are in sync on the behavior of a particular instruction, we cannot guarantee that all the lifters are faithful in lifting that instruction, which is however, a general limitation of differential testing based approach. Also, as MeanDiff is testing multiple binary lifters  together, hence it cannot be used to establish the faithfulness in lifting the semantics of an instruction which is not implemented in one of the lifters. 
+%
+
+Myreen et al.~\cite{Myreen:FMCAD:2008,Myreen:FMCAD:2012} proposed proof-producing decompilation where they translates a sequence of machine code to a tail-recursive function, which accurately describes the effect of the given machine code and hides irrelevant details of the underlying machine language specification.
 
 Having said that, we formulated our problem statement as follows:
 
