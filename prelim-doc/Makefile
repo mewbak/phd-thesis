@@ -1,4 +1,4 @@
-PAPER=prelim-doc
+PAPER=csthesis
 
 TEX = $(wildcard *.tex)
 

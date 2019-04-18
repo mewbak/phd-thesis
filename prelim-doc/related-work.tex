@@ -39,13 +39,13 @@ definitions. A basic block and variable correspondence is inferred by a
 scanning algorithm that traverses the function definitions.  For example, when
 the scanning algorithm visits a branch condition \m{e} in the original program,
     it determines whether \m{e} is eliminated due to the optimizations. If it
-    is eliminated, then the information collected is either \m{e = 0} or \m{¬e
+    is eliminated, then the information collected is either \m{e = 0} or \m{~e
       =0}, depending on which branch of \m{e} is preserved in the optimized
       program. 
 %
 If \m{e} is not eliminated, then it corresponds to another branch condition
 \m{e'} in the optimized program. The information collected is either \m{e = e'}
-or \m{e = ¬e'}, depending on the correspondence of \m{e}’s and \m{e'}’s
+or \m{e = ~e'}, depending on the correspondence of \m{e}’s and \m{e'}’s
 branches. This shows that, besides symbolic evaluation, Necula’s technique has
 to solve some equalities to determine which branches are eliminated and also to
 determine the correspondence between branches in the two programs. Moreover, to
