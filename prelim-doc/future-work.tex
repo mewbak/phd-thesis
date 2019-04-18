@@ -11,47 +11,231 @@ Given the importance of binary analysis, establishing the faithfulness of
 binary lifter (or decompilers) is most desirable, which is what we propose as
 our future work.
 
-Despite of the importance in establishing the faithfulness os the binary lifters,
-there has been surprisingly little effort towards that direction. 
-%
-The most widely used approach in validating the binary lifters is based on random testing, where the translator is considered as a black-box. Most notable work along this line  is that of Martignoni et al.~\cite{Martignoni:ISSTA2009, Martignoni:ISSTA2010}, which
- proposes differential testing on QEMU~\cite{QEMU:USENIX05} and Bochs~\cite{Bochs1996}.
-Specifically, they compared the state between a physical and an emulated CPU
-after executing randomly chosen instructions on both to discover any semantic
-deviations. In a related work, Martignoni \etal~\cite{Martignoni:ASPLOS2012} uses symbolic execution on a Hi-Fi emulator~\cite{Bochs1996}, defined as an binary emulator which is more complete in terms of instructions coverage of IA-32 ISA and faithful, to generate high-quality test cases to validate  a Lo-Fi emulator~\cite{QEMU:USENIX05}, defined as  less complete and buggier emulator. In both the above cases, validation works as follows: The binary and the lifted IR are executed independently, one on real hardware and the other on the emulator under test, and the output states are matched. Although, a simple and scalable approach, it's effectiveness is limited because many semantics bugs in binary lifters are triggered upon a specific input and exercising all such corner inputs is non-trivial. Note that, even though Martignoni \etal~\cite{Martignoni:ASPLOS2012} symbolically explored the test-cases which are supposed to covers all the paths of a given instruction's implementation, but being a differential testing-based approach, the faithfulness depends directly on  the faithfulness of the Hi-Fi emulator. A wrong implementation (or even omission of a particular case) of instruction semantics in the Hi-Fi, will lead to test-cases insufficient to explore all the paths and hence find bigs in the Low-Fi emulator. Moreover, their technique relies on the X86 the interpreter FuzzBALL. A bug in the later will effect the generation of high-fidelity test cases for a particular instruction, leading to incomplete coverage of the instruction's implementation in Low-Fi emulator. In summary, the test-based approach to validation the binary lifters are simple and scalable, but cannot be trusted to establish faithfulness.     
-
-Another direction to establish guarantees in the binary translation is by using formal methods. The most notable effort along the direction is the system  Meandiff, developed by Soomin \etal~\cite{ASE2017}.
-%
-MeanDiff proposed a N-version IR testing to test three binary lifters, BAP~\cite{BAP:CAV11}, BINSEC~\cite{BINSEC2011}, and PyVEX~\cite{PYVEX} translating binary to BIL, DBA, and VEX IRs respectively). The tools symbolically execute each of the IR instances, lifted from a single binary, to generate symbolic summaries to be compared using a SAT solver. MeanDiff neither handle floating point operations, nor the instructions which does not manifest their side-effects (like flag updates) explicitly. Moreover, MeanDiff reports a bug whenever a deviation is detected w.r.t the instruction-semantics-behavior in at least two binary lifters. But even if all the binary lifters are in sync on the behavior of a particular instruction, we cannot guarantee that all the lifters are faithful in lifting that instruction, which is however, a general limitation of differential testing based approach. Also, as MeanDiff is testing multiple binary lifters  together, hence it cannot be used to establish the faithfulness in lifting the semantics of an instruction which is not implemented in one of the lifters. 
-%
-
-Myreen et al.~\cite{Myreen:FMCAD:2008,Myreen:FMCAD:2012} proposed proof-producing decompilation where they translates a sequence of machine code to a tail-recursive function, which accurately describes the effect of the given machine code and hides irrelevant details of the underlying machine language specification.
-
 Having said that, we formulated our problem statement as follows:
 
 \vspace{10pt}
 
-\noindent\textbf{Problem Statement}: \emph{Formally establishing the
-  faithfulness of state-of-the-art binary lifters without relying on random
-    testing}
+\noindent\textbf{Problem Statement}: \emph{Developing binary-translator-agnostic tools and techniques to formally  
+    validate the translation from binary to high level IR}
 
-Next, we will discuss the challenges in the proposed work and the detailed
-steps that we envision to mitigate those.
+Specifically, we would like to validate the translation from binary to high
+level IR considering the translator as a black-box, thereby, applying the
+techniques to multiple state-of-art binary lifters/translators. This is
+opposed to validating the translator\footnote{Translator validation uses a
+  theorem prover or proof assistant to verify a translator correct, once and
+    for all, so that all translator output is guaranteed correct for all valid
+      source programs. Translation validation, on the other hand, runs a
+        theorem prover after each translation to check that the output of the
+        translator is semantically equivalent to the source program.}, as
+         in  compiler verification~\cite{Leroy:2009}, which
+        is not only more involving but is specific to the individual
+        translators.
 
-\section{Challenges}\label{sec:approach}
+Next, we will discuss the recent efforts in validating the binary lifters in
+Section~\ref{sec:recent-advances} and challenges in the proposed work( Section
+    ~\ref{sec:challenges}) and the detailed steps (Section) that we envision to
+mitigate those.
 
-One of the long standing challenge in engineering a faithful binary lifter is
-to comprehend the huge volume and complexity of instructions as specified in
-the Intel manual~\cite{IntelManual} with over $3,800$ pages written in an
-ad-hoc combination of English and pseudo-code. The \ISA ISA has a large number
-of instructions, partly because of a large number of complex instructions and
-partly because it keeps most of the legacy and deprecated instructions
-($~336$+) for the sake of backwards compatibility. It consists of $996$
-mnemonics, and each mnemonic admits several variants, depending on the types
-(i.e., register, memory, or constant) and the size (i.e., the bit-width) of
-operands. Moreover, the x86-64 reference manual informally explains the
-instruction behaviors, leaving certain details unspecified or ambiguous, which
-requires  to consult with an actual processor implementation to clarify such
-details. Completely formalizing the vast number of instructions with carefully
-identifying all the corner cases from the informal document, thus, is highly
-non-trivial.
+\section{Recent Advances in Validation of Decompilation}\label{sec:recent-advances}
+
+Despite of the importance in establishing the faithfulness of the binary
+lifters, there has been surprisingly little effort towards that direction.
+%
+The most widely used approach in validating the binary lifters is based on
+random testing, where the translator is considered as a black-box. Most notable
+work along this line  is that of Martignoni et al.~\cite{Martignoni:ISSTA2009,
+  Martignoni:ISSTA2010}, which proposes differential testing on
+  QEMU~\cite{QEMU:USENIX05} and Bochs~\cite{Bochs1996}.  Specifically, they
+  compared the state between a physical and an emulated CPU after executing
+  randomly chosen instructions on both to discover any semantic deviations. In
+  a related work, Martignoni \etal~\cite{Martignoni:ASPLOS2012} uses symbolic
+  execution on a Hi-Fi emulator~\cite{Bochs1996}, defined as an binary emulator
+  which is more complete in terms of instructions coverage of IA-32 ISA and
+  faithful, to generate high-quality test cases to validate  a Lo-Fi
+  emulator~\cite{QEMU:USENIX05}, defined as  less complete and buggier
+  emulator. In both the above cases, validation works as follows: The binary
+  and the lifted IR are executed independently, one on real hardware and the
+  other on the emulator under test, and the output states are matched.
+  Although, a simple and scalable approach, it's effectiveness is limited
+  because many semantics bugs in binary lifters are triggered upon a specific
+  input and exercising all such corner inputs is non-trivial. Note that, even
+  though Martignoni \etal~\cite{Martignoni:ASPLOS2012} symbolically explored
+  the test-cases which are supposed to covers all the paths of a given
+  instruction's implementation, but being a differential testing-based
+  approach, the faithfulness depends directly on  the faithfulness of the Hi-Fi
+  emulator. A wrong implementation (or even omission of a particular case) of
+  instruction semantics in the Hi-Fi, will lead to test-cases insufficient to
+  explore all the paths and hence find bugs in the Low-Fi emulator. Moreover,
+  their technique relies on the X86 the interpreter FuzzBALL. A bug in the
+  later will effect the generation of high-fidelity test cases for a particular
+  instruction, leading to incomplete coverage of the instruction's
+  implementation in Low-Fi emulator. In summary, the test-based approach to
+  validation the binary lifters are simple and scalable, but cannot be trusted
+  to establish faithfulness.     
+
+Another direction to establish guarantees in the binary translation is by using
+formal methods. The most notable effort along the direction is the system
+MeanDiff, developed by Soomin \etal~\cite{ASE2017}.
+%
+MeanDiff proposed a N-version IR testing to test three binary lifters,
+         BAP~\cite{BAP:CAV11}, BINSEC~\cite{BINSEC2011}, and PyVEX~\cite{PYVEX}
+         translating a single binary instruction  to BIL, DBA, and VEX IRs
+         respectively). The tools symbolically execute each of the IR
+         instances, lifted from a single binary instruction, to generate
+         symbolic summaries to be compared using a SAT solver. MeanDiff neither
+         handle floating point operations, nor the instructions which does not
+         manifest their side-effects (like flag updates) explicitly. Moreover,
+         MeanDiff reports a bug whenever a deviation is detected w.r.t the
+         instruction-semantics-behavior in at least two binary lifters. But
+         even if all the binary lifters are in sync on the behavior of a
+         particular instruction, we cannot guarantee that all the lifters are
+         faithful in lifting that instruction, which is however, a general
+         limitation of differential testing based approach. Also, as MeanDiff
+         is testing multiple binary lifters  together, hence it cannot be used
+         to establish the faithfulness in lifting the semantics of an
+         instruction which is not implemented in one of the lifters. 
+%
+
+Myreen et al.~\cite{Myreen:FMCAD:2008,Myreen:FMCAD:2012} proposed
+proof-producing decompilation where they translates a sequence of machine code
+to a tail-recursive functions defined in the language of a theorem prover,
+   which accurately describes the effect of the given machine code and hides
+   irrelevant details of the underlying machine language specification. Along
+   similar lines,  a recent work by Roessle et al.~\cite{Roessle:CPP19}
+   presents a method to extract the symbolic summary of a sequential binary
+   program using the symbolic specification of instruction semantics extracted
+   mostly from Strata. To the best of our knowledge, none of them has been used
+   to validate the translation achieved by the state-of-the-art decompilers. 
+%
+
+Another recent work by Schulte \etal~\cite{eschulte2018bed} proposed
+Byte-Equivalent Decompilation (BED) which leveraged a genetic optimization
+algorithm to infer C source code from a binary. Given a target binary and an
+initial population with decompilation candidates, they  drive a genetic
+algorithm to improve the initial candidates, driving them closer to
+byte-equivalence w.r.t the target binary. The byte equivalence  is simply the
+edit distance to the target binary. As hypothesized in the future work section
+of the paper~\cite{eschulte2018bed}, BED could be applied to LLVM IR instead of
+C to evolve lifting from machine code to LLVM IR and may work well due to the
+relative simplicity of LLVM IR as compared to the C. Being byte-equivalent the
+generated LLVM IR will be the faithful evolution from the machine code.
+However, as shown in the paper, this approach worked moderately well for
+smallish binaries, it is still a challenge to realized a end-end binary to LLVM
+decompiler which is correct by construction.
+
+\section{Challenges in Translation Validation of Decompilers}\label{sec:challenges}
+According to the pioneering work by Amir \etal~\cite{Pnueli:1998}, following
+are three key ingredients to set up a fully automatic translation validation
+system:
+
+\paragraph{Providing Common Semantic framework} This ingredient requires a
+common semantic framework in order to represent both the source (as \ISA binary
+    program) and the target code(as LLVM IR). Such a common framework allows
+the source and target programs to be both represented using a common
+specification language which assist reasoning over them. Moreover, the
+semantics framework need to be general enough to model programs written in
+different languages.
+
+One of the long standing challenge, which deters many previous efforts like
+~\cite{ASE2017}, in employing a formal validation approach in validating
+binary lifters, is the lack of formal specification of the \ISA instructions
+specifying binary program. Such instruction are massive in both numbers and
+complexity and are specified in an informal manner in the Intel
+manual~\cite{IntelManual} worth over $3,800$ pages. The \ISA ISA has a large
+number of instructions, partly because of a large number of complex
+instructions and partly because it keeps most of the legacy and deprecated
+instructions ($~336$+) for the sake of backwards compatibility. It consists of
+$996$ mnemonics, and each mnemonic admits several variants, depending on the
+types (i.e., register, memory, or constant) and the size (i.e., the bit-width)
+  of operands. Moreover, the x86-64 reference manual informally explains the
+  instruction behaviors, leaving certain details unspecified or ambiguous,
+  which requires  to consult with an actual processor implementation to clarify
+  such details. Completely formalizing the vast number of instructions with
+  carefully identifying all the corner cases from the informal document, thus,
+  is highly non-trivial.
+
+\paragraph{Providing Formal Notion of Program Equivalence} This ingredient
+expects for the existence of designated control location(s) in the computations
+of the source and target programs, that can serve as an observation point(s)
+  for comparing the values of a set of externally observable variables
+  (input/output variables, for example). The challenge here is to formally
+  establish the notion that the lifted LLVM IR  correctly implements the \ISA
+  binary code. Given the recent advances in translation validation in
+  validating compilation, a basic version of this strategy is likely quite
+  feasible today, however, there are additional challenges to deal with when it
+  comes to validating the decompilation pipeline, like finding function, basic
+  block and variable correspondence for checking equivalence, identifying and
+  pruning glue code added during decompilation, to make the equivalence checker
+  aware of the optimizations performed by the decompiler (e.g.  recovering
+      function prototype, type etc).
+
+\paragraph{Providing automated proof generator and checker} that is responsible
+for generating a machine-checkable proof  of valid translation for a given pair
+of input and output programs as per the notion of equivalence established
+above. The proof can be generated by  the binary-translator itself.
+Intuitively, the proofs will try to establish equivalence between
+synchronization points which are symbolic descriptions that capture the set of
+pairs of relevant states of the input and output programs. However, we want 
+the proof generator to be agnostic of the binary-translator involved, which 
+makes the problem  even more challenging.   
+
+
+\section{Proposed Approach}\label{sec:approach} In this section we would
+outline our setup to validate the translation from binary to LLVM IR and
+propose solution to mitigate the challenges mentioned in
+Section~\ref{sec:challenges}. 
+
+
+As the common semantic framework for the representation of the binary code and
+the lifted LLVM IR code, we decided to build on K~\cite{k-primer-2013-v32},
+    which is a one of the state-of-the-art frameworks for defining formal
+    language semantics (Refer to Section~\ref{sec:related-work} for the other framework options}. Given a
+    syntax and a semantics of a language, K generates a parser, an interpreter,
+    as well as formal analysis tools such as model checkers and deductive
+    program verifiers, at no additional cost. Using the interpreter, one can
+    test their semantics immediately, which significantly increases the
+    efficiency of semantics developments. Furthermore, the formal analysis
+    tools facilitate formal reasoning about the given language semantics. This
+    helps in terms of both applicability of the semantics and engineering the
+    semantics itself.
+    
+In formal methods literature, the notion of program (or semantic) equivalence
+is usually formalized as a bi-simulation relation~\cite{Sangiorgi:2011} between
+pairs of states of the two programs that are subject to prove equivalence
+(which in turn are represented as state transition systems). Ideally, we want a
+bi-simulation variant that allows us to simply relate the states where the two
+programs actually synchronize, i.e., at the start of corresponding functions or
+basic blocks, at the loop headers, etc. We borrowed the novel concept of 
+bisimulation, called \emph{cut-bisimulation}, from ~\cite{}.
+Cut-bisimulation is well-suited for translation  across language changes, as it
+can ignore program points of no interest in the input and/or output
+program.\Comment{Brief the concept}
+
+As for the last ingredient of a \TV system, we would like to design them with
+the two primary goals in mind: (1) Language independence, and (2) Translator
+independence. Language independence is desirable so as to use the proof
+generator and the checker to be used for   many different lifted IRs (like
+    LLVM, BIL etc.). Indeed, the proof generator has to take into account the specifics
+of the translation and some of the naive approaches to do that are by using
+translator-generated hints or heuristics inspired by the translation's effect.
+Both of these approaches  are translator specific and ad-hoc. Whereas, we would
+like the proof generator to work uniformly across translators.   
+ 
+ Toward the end to achieve language-independence, we borrowed a
+ language-independent equivalence checking algorithm that can be parameterized
+ with the input and output language semantics. The algorithm employs the notion
+ of cut-bisimulation, mentioned above, and the program point pairs needed for
+ the proof are provided as an input to the algorithm, and are called
+ synchronization points. Intuitively, synchronization points are symbolic
+ descriptions that capture the set of pairs of relevant (concrete) states of
+ the input and output programs.
+ 
+ The above equivalence checking algorithm is implemented using the K
+ framework~\cite{k-primer-2013-v32}, in a tool we call Keq that accepts formal
+ semantic definitions for the input and output languages. In order to use Keq
+ for \TV of the binary decompilation to LLVM IR, we have developed \K semantic
+ definitions of the most complete user-level \ISA (Refer to Section
+     ~\ref{sec:results}). Moreover, the semantics of a subset of LLVM IR is
+ already available~\cite{LLVMSEMA} for us to leverage and build on. 
+ 
+ \paragraph{Generating Synchronization Points}
