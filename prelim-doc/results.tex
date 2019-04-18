@@ -1,9 +1,9 @@
-\section{Results Obtained So Far}\label{sec:results}
+\chapter{Results Obtained So Far}\label{sec:results}
 The equivalence checker being parametric on the semantics of source (\ISA) and target (LLVM) languages of decompilation, one of the important steps towards the goal is to define these semantics. In this section, we will discuss our contribution is coming up with the most complete and thoroughly tested formal
 semantics of x86-64 to date~\cite{DasguptaAdve:PLDI19}.
 
 
-\subsection{Challenges in Formalizing \ISA}
+\section{Challenges in Formalizing \ISA}
 \label{sec:challenges-in-formalizing-x86}
 The \ISA instruction set architecture (ISA) is one of the most complex and widely used ISAs on servers and desktops, and ensuring the correctness of the \ISA binary code is important.
 %
@@ -50,7 +50,7 @@ Identifying and faithfully specifying all of the undefined behaviors, thus, are 
 \SC{In our semantics, we faithfully modeled the undefined value as a unique symbol (called \s{undef}) whose value is nondeterministically decided each time within the proper range.}
 These nondeterministic values are enough to capture and formally reason about all possible behaviors of the instructions for different processors (and even any future, standard-conforming processor).
 
-\subsection{Existing Semantics for \ISA}
+\section{Existing Semantics for \ISA}
 
 To date, to the best of our knowledge, despite several explicit attempts~\cite{Heule2016a,Goel:FMCAD14,Goel:ProCoS17} and other related systems~\cite{Leroy:2009,Remill,TSL:TOPLAS13,Hasabnis:ASPLOS16,Hasabnis:FSE16},
 no \emph{complete} formal semantics of \ISA exists that can be used for formal reasoning about x86 binary programs.
@@ -71,7 +71,7 @@ Goel~\etal~\cite{Goel:FMCAD14,Goel:ProCoS17}, on the other hand, specified a for
 There also have been several attempts~\cite{Angr1,BAP:CAV11,Radare2,Hasabnis:FSE16} to \emph{indirectly} describe the \ISA semantics, where they define an intermediate language (IL), specify the IL semantics, and translate \ISA to the IL.
 This indirect semantics, however, may not be general enough to be used for different types of formal analyses, since the IL might be designed with specific purposes in mind, not to mention that the translation may miss certain important details of the instruction behaviors.
 %
-\subsection{Overview of the Approach}
+\section{Overview of the Approach}
 \label{sec:Approach:Overview}
 
 Briefly, our approach is as follows.

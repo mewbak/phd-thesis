@@ -1,10 +1,10 @@
-\section{Related Work}\label{sec:related-work}
+\chapter{Related Work}\label{sec:related-work}
 Our proposed approach builds on top of a number of ideas/concepts related to
 Equivalence checking, \TV, and Software Verification, Establishing faithfulness
 of binary lifters, and Semantics defining frameworks which we will be briefed as well.
 This section is dedicated to enumerating the recent advances in each of those.
 
-\subsection{Translation Validation}
+\section{Translation Validation}
 
 Hawblitzel et al.~\cite{Hawblitzel:FSE2013} use a TV approach to determine
 whether assembly code produced by different versions of the CLR JIT compiler
@@ -87,9 +87,9 @@ transformation is applied, the mapping is changed to reflect the effects of the
 transformation. Thus, in this technique, one needs to know what and in which
 order the transformations are applied by the optimizing phase.  
 
-\subsection{Establishing faithfulness of Binary Analysis Tools}
+\section{Establishing faithfulness of Binary Analysis Tools}
 
-\paragraph{Using Simulation Testing}
+\subsection{Using Simulation Testing}
 
 Martignoni et al.~\cite{Martignoni:ISSTA2009, Martignoni:ISSTA2010} attempted
 to leverage differential testing on QEMU~\cite{QEMU:USENIX05} and
@@ -146,7 +146,7 @@ signature information or any learning phase. They evaluated Nucleus on a
 diverse set of $476$ C and C++ binaries, compiled with gcc, clang and Visual
 Studio for x86 and x64, at optimization levels O0--O3. 
   
-\paragraph{Using Formal Methods}
+\subsection{Using Formal Methods}
 
 MeanDiff,~\cite{ASE2017} proposed a N-version IR testing to test three binary
 lifters, BAP~\cite{BAP:CAV11}, BINSEC~\cite{BINSEC2011}, and PyVEX~\cite{PYVEX}
@@ -181,7 +181,7 @@ the source C code containing inline assembly to binary with debug information,
     predicate recovery. The float point operations are skipped because of the
     lack of support in BINSEC.   
 
-\paragraph{Using Machine Learning}
+\subsection{Using Machine Learning}
 
 ~\cite{eschulte2018bed} leveraged a genetic optimization algorithm to infer
 source code from a binary. Given a target binary and an initial population with
@@ -194,7 +194,7 @@ initial population includes decompiler seeds, and $4$ achieve full byte
 equivalence when the initial population included decompilation candidates  from
 the HEX-RAYS~\cite{hexray} Decompiler. 
 
-\subsection{Equivalence Checking}
+\section{Equivalence Checking}
 
 With the ultimate goal of translation validation for optimizing compilers,
      ~\cite{Iman2005} proposed an algorithm for solving the problem of finding
@@ -221,7 +221,7 @@ used to determine the program locations of synchronization points and the live
 variables while the constraints between variables are inferred from execution
 traces.
 
-\subsection{Machine Learning-Assisted Binary Code Analysis}
+\section{Machine Learning-Assisted Binary Code Analysis}
 
 Jaffe \etal~\cite{Jaffe:2018ICPC} proposes a technique to assign meaningful
 variable names to decompiled C code by learning names that developers have
