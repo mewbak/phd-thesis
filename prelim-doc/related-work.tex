@@ -87,6 +87,11 @@ transformation is applied, the mapping is changed to reflect the effects of the
 transformation. Thus, in this technique, one needs to know what and in which
 order the transformations are applied by the optimizing phase.  
 
+DDEC~\cite{DDEC:OOPSLA:2013} is an data-driven equivalence checker for x86 loops that uses data
+collected from test runs rather than inference or hints to construct a
+simulation relation. For evaluation, they prove the equivalence of code produced by \textsc{COMPCERT}~\cite{CompCert:FM06} and gcc (with otimization enbaled).
+
+
 \section{Establishing faithfulness of Binary Analysis Tools}
 
 \subsection{Using Simulation Testing}
@@ -196,24 +201,23 @@ the HEX-RAYS~\cite{hexray} Decompiler.
 
 \section{Equivalence Checking}
 
-With the ultimate goal of translation validation for optimizing compilers,
-     ~\cite{Iman2005} proposed an algorithm for solving the problem of finding
-     basic block and variable correspondence between two GCC RTL programs from
-     the same source using different optimizations.  The essence of their
-     technique is interpretation of the two programs on random inputs and
-     comparing the histories of value changes for variables. If a variable
-     \m{x1} in the original program have the same values as a variable \m{x2}
-     in the optimized version at some control blocks for all possible runs of
-     the two programs on the same input values, then they are defined as
-     corresponding variables. However, the paper do not consider the VC
-     generation from a given correspondence or proving the VCs. Moreover, the
-     paper do not try to address any reordering transformation, that is any
-     transformation that changes the order of execution of code, without adding
-     or deleting any executions of any statement. Also, using random values
-     results in poor code coverage which is detrimental to finding variable
-     correspondence. We note that only the basic blocks \m{b1} and \m{b2},
-     which are covered by the same test input run in original and optimized
-     versions respectively, can be the candidate for correspondence.     
+With the ultimate goal of translation validation for optimizing compilers, Iman
+\etal~\cite{Iman2005} proposed an algorithm for solving the problem of finding
+basic block and variable correspondence between two GCC RTL programs from the
+same source using different optimizations.  The essence of their technique is
+interpretation of the two programs on random inputs and comparing the histories
+of value changes for variables. If a variable \m{x1} in the original program
+have the same values as a variable \m{x2} in the optimized version at some
+control blocks for all possible runs of the two programs on the same input
+values, then they are defined as corresponding variables. However, the paper do
+not consider the VC generation from a given correspondence or proving the VCs.
+Moreover, the paper do not try to address any reordering transformation, that
+is any transformation that changes the order of execution of code, without
+adding or deleting any executions of any statement. Also, using random values
+results in poor code coverage which is detrimental to finding variable
+correspondence. We note that only the basic blocks \m{b1} and \m{b2}, which are
+covered by the same test input run in original and optimized versions
+respectively, can be the candidate for correspondence.     
 
 DDEC~\cite{DDEC:OOPSLA:2013} uses a combination of static analysis and
 data-driven inference for constructing simulation relations: Static analysis is
