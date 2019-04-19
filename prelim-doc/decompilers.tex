@@ -1,9 +1,22 @@
 \chapter{Background on Decompilers: Facilitating Binary Analysis}\label{sec:decompilers}
 
-Despite the various challenges in analyzing machine code (Refer
-    Chapter~\ref{sec:ba}), there has been impressive amount of work to rebuild
-a close approximation of the high-level source code from a compiled binary
-using various decompilation
+Binary analysis is not easy~\cite{Meng:2016} and few long standing
+challenges can be enumerated as follows:
+\begin{itemize}
+    \item Code and Data Ambiguity
+    \item No Fixed Procedure Layout
+    \item Missing or Untrusted Symbol Information
+    \item Complex instruction Set
+    \item Indirect Branches
+    \item Overlapping Instructions
+    \item Abusing Calls and Returns
+    \item Lack of Types
+    \item Presence of Non-returning functions
+\end{itemize}
+
+Despite the various challenges in analyzing machine code, there has been
+impressive amount of work to rebuild a close approximation of the high-level
+source code from a compiled binary using various decompilation
 frameworks~\cite{McSema:Recon14,Remill,Angr1,BAP:CAV11,Radare2,FCD,BitBlaze:2008,hexray,Fokin:2011,eschulte2018bed,katz2018rnn,Schwartz:2013,IDA,mctoll,revgen}.
 
 Binary analysis using a decompilation framework is achieved by (1) Binary

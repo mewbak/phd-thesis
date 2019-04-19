@@ -1,4 +1,70 @@
 \chapter{Introduction}\label{sec:ba}
+
+%The problem you want to tackle
+Analysing binary code is crucial in software engineering and security research.
+Some of the notable applications of binary analysis can be found in binary
+instrumentation [13], [36], [40], [46], binary translation [20], software
+hardening [16], [26], [59], [60], software testing [9], [17], [27], CPU
+emulation [12], [42], malware detection [18], [33], automated reverse
+engineering [21], [38], [39], [52], [57], and automatic exploit generation
+[15]. Binary analysis is generally performed by existing decompiler projects
+~\cite{McSema:Recon14,Remill,Angr1,BAP:CAV11,Radare2}, whose very first step is
+to translate se machine code to a intermediate representation (IR), and thereby
+exposing many high-level properties (like control flow, function boundary and
+    prototype, variable and their type etc.) of the the binary, which  assist
+further analysis and/or optimization. Formally establishing faithfulness of the
+decompilation (i.e. translation from machine code to high level IR) is pivotal
+to gain trust in any binary analysis. Any bug in the translation would
+%What is the current state of the art and why that is insufficient
+invalidate the binary analysis results. Despite of the importance in
+establishing the faithfulness of the binary lifters, there has been
+surprisingly little effort towards that direction. The most widely used
+approaches in validating the binary lifters are either based on
+hardware-cosimulation testing~\cite{Martignoni:ISSTA2009,Martignoni:ISSTA2010},
+  which is limited by the fact that generating specific test-cases to uncover
+  semantic bugs in the lifter is non-trivial, or differential
+  testing~\cite{Martignoni:ASPLOS2012,ASE2017}, which is limited in terms of
+  instruction coverage and faithful-ness guarentess (Refer to
+      Chapter~\ref{related-work}).
+
+%How you plan to improve on the state of the art
+The goal of our proposal is employ \TV on binary lifters by leveraging
+the semantics of the languages involved (e.g. the Intel's X86-64 and the
+    high-level IR).  Given the recent advances in translation
+validation~\cite{} in validating compilation~\cite{}, a basic version of this
+strategy is likely quite feasible today, however, there are additional
+challenges to deal with when it comes to validating the decompilation
+pipeline(Refer Chapter~\ref{approach}). We would like validation approach to be
+general enough and hence applicable to any state-of-the-art binary to LLVM IR
+translators~\cite{McSema:Recon14,Remill,FCD,reopt,llvm-mctoll}, thereby
+avoiding any translator specific customization during validation.  However,
+         having this goal makes the problem even more challenging.
+
+We believe that formally validating the translation is more robust as
+compared to (1) validating the translation using random (or low coverage)
+  test-cases, and (2) differential testing technique which proves the
+  correctness of a translation, provided by a translator, by comparing its behaviors with
+  that provided by other translators under test. This means,
+  declaring a translation to be correct assumes the correctness of all the
+  translator.
+
+%Summarize your contributions
+\paragraph{Contributions}
+Below are our primary contributions.
+
+\emph{Employing \TV on binary translators~} We propose tools and techniques to
+formally validate the translation from binary to high level IR. To the best of
+our knowledge, we are the first to propose usig \TV to establish the
+faithfulness of binary lifters targetting LLVM as their high-level IR.
+
+\emph{Translator-agnostic solution~} We would like our validator to work
+uniformly across translators without using any translator-generated hints or
+translator-specific heuristics.
+
+
+In the ext section, we provide the motivation behind the importance binary analysis.
+%Why it is important
+\section{Benefits of Binary Analysis}
 Analysis and reasoning about source code is one of the most pervasive concepts
 in computer science research. Analyzing the code to approximate  the semantics
 of the program helps in determining the correctness of the program as per some
@@ -76,16 +142,5 @@ abstract interpretation~\cite{Cousot1977} are the well known techniques used,
     performance and reliability.
 \end{itemize}
 
-Indeed, binary analysis is not easy~\cite{Meng:2016} and few long standing
-challenges can be enumerated as follows:
-\begin{itemize}
-    \item Code and Data Ambiguity
-    \item No Fixed Procedure Layout
-    \item Missing or Untrusted Symbol Information
-    \item Complex instruction Set
-    \item Indirect Branches
-    \item Overlapping Instructions
-    \item Abusing Calls and Returns
-    \item Lack of Types
-    \item Presence of Non-returning functions
-\end{itemize}   
+
+
