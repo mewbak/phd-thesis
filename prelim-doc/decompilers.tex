@@ -1,5 +1,83 @@
 \chapter{Background on Decompilers: Facilitating Binary Analysis}\label{sec:decompilers}
 
+Analysis and reasoning about source code is one of the most pervasive concepts
+in computer science research. Analyzing the code to approximate  the semantics
+of the program helps in determining the correctness of the program as per some
+gold standard or determining illegal memory and control flow accesses, or
+proving/refuting various properties of interest to the users. Static
+analysis~\cite{Nielson2010}, model checking~\cite{Clarke1981,Queille1982}, and
+abstract interpretation~\cite{Cousot1977} are the well known techniques used,
+widely and with ease, for the  analysis of source code and have been
+deployed in many tools and processes that improve the software
+quality~\cite{Xie:2003,Musuvathi:2008,Ivancic:2005,Dwyer:2007,Binkley:2007,Bessey2010,Ball2006}.
+Once the software, written in some high-level language, is compiled
+into binary format and shipped, the users down the line have to trust
+the vendor and the distributors about the quality and security of the
+product. Even when the distributors can be trusted, the compilation
+pipeline might introduce a bug in the binary and hence ensuring trust
+in the binary requires the compiler to be in the trusted computing
+base.  All the static source code analysis techniques, mentioned
+above, are targeted to human readable source code written in high
+level languages as apposed to low level binary code. Analysis at the
+binary level is difficult mainly because many source level
+information, e.g. loops, procedures, or classes which provides a
+natural structural partitioning of programs into functionally related
+units and assist source level analysis, are completely or partially
+lost during the compilation process. Moreover, some source level
+information, like symbol information, types, function boundaries and
+their prototypes, which creates a logical view of the program  within
+a structural partition, is also stripped off during the compilation
+process. Absence of symbol information and types means that variables
+are not easily identified, but are represented by reusable registers
+and the memory, which is addressable as a large continuous array.
+Registers and memory carry no type information, and pointers of any
+type are indistinguishable from integers.  Despite of these
+difficulties, there are several compelling reasons to do analysis at
+the binary level, We enumerate the most important ones as follows:
+
+\begin{itemize}
+    
+    \item Analyzing stripped binary executables, i.e., binaries without symbol
+    or debugging information, enables software analysis without access to
+    source code. Such scenarioes arises in the case of (1) legacy code, when
+    binary analysis is the only viable option to re-implement (or patch) the
+    program, or (2) malwares, when binary analysis helps in security audits or
+    malware
+    detection~\cite{Christodorescu:2005,Andreas2007,Kinder:2005,Kinder:2010,Kolbitsch:2009}.
+    
+    \item There are challenges that the source code based analysis tools has to
+    face  in dealing with the code written in different feature-rich high-level
+    languages, for example, parsing support for  the high-level constructs.
+    Moreover, while analyzing source code, the libraries are often replaced by
+    coarse grained abstractions~\cite{libabs}. Operating on the binary avoids
+    these issues altogether, since all source languages are translated into a
+    hardware specific, but single target language with no distinction between
+    the source code or library code. \cmt{However, a common workaround for these
+        problems, which already in common practice, is to preprocess input files
+        into a simpler intermediate form which is amenable for analysis. For
+        example, for languages that are compiled to an intermediate form, such as
+        Java bytecode, Microsoft's Common Intermediate Language (CIL), or
+        LLVM~\cite{Lattner:2004} IR, it is already common practice to analyze IR
+        instead of source, in order to avoid problems from parsing and to support
+        all the different source language idiosyncrasies.}
+    
+    \item Even when the source code is available, doing analysis at the binary
+    level alleviates the need to trust the correctness of the compiler.
+    Moreover, during the compilation process, the source code undergoes many
+    modification, removal or additions, before translated to binary and
+    analyzing that binary is desirable because it is what is executed on
+    hardware~\cite{WYSINWYE}. 
+    \cmt{ 
+        \item Binary analysis is heavily leveraged by various tools, ranging from
+        software emulation and
+        virtualization~\cite{QEMU:USENIX05,Valgrind:ENTCS03,DynamoRIO:2004,Pin:2005},
+        malware analysis~\cite{BitBlaze:2008,BAP:CAV11,Egele:USENIX07,Yin:CCS07},
+        reverse engineering~\cite{McSema:Recon14,Angr,Radare2},
+        sand-boxing~\cite{Kiriansky:2002:SEV,Erlingsson:2006,Yee:2009}, and
+        profiling~\cite{Harris:2005,Srivastava:1994}, in order to improve their
+        performance and reliability.}
+\end{itemize}
+
 Binary analysis is not easy~\cite{Meng:2016} and few long standing
 challenges can be enumerated as follows:
 \begin{itemize}
@@ -27,9 +105,10 @@ the binary code. The lifted IR exposes many high-level properties (like control
 the binary, which are otherwise lost during the compilation pipeline, and (2)
   performing the analysis at the IR level.  Analyzing the binary using the
   abstractions lifted to such high-level IR assist further analysis and/or
-  optimization. We note that the IR, being the basis for any binary analysis
-  techniques, the faithfulness of the lifting or decompilation process is
-  highly desirable. 
+  optimization. 
+  %We note that the IR, being the basis for any binary analysis
+  %techniques, the faithfulness of the lifting or decompilation process is
+  %highly desirable. 
 
 Binary analyzes are mostly agnostic to any specific high-level IR, but many
 projects~\cite{McSema:Recon14,Remill,FCD,reopt,mctoll} prefer to employ LLVM
