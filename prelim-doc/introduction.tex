@@ -3,82 +3,86 @@
 %The problem you want to tackle
 Analyzing binary code is crucial in software engineering and security research.
 Some of the notable applications of binary analysis can be found in binary
-instrumentation (\cite{Bruening:CGO2003,PEBIL10,Pin:2005,Valgrind:ENTCS03,DynamoRIO:2004}),
-                binary translation~\cite{UQBT:2000}, software hardening
-                (\cite{Cha:2015,Ford:2008,Zhang,Zhang:2013}), software testing
-                (\cite{Chipounov:2011,Avgerinos:2014,godefroid_automated_2008}),
-                CPU emulation (\cite{QEMU:USENIX05,Magnusson:2002}), malware
-                detection (\cite{Christodorescu:2005,Kruegel:2004,BitBlaze:2008,BAP:CAV11,Egele:USENIX07,Yin:CCS07}), automated
-                reverse engineering
-                (\cite{Cui:2008,Lin:2008,Schwartz:2013,Yakdan2015NDSS,McSema:Recon14,Angr,Radare2}), sand-boxing~\cite{Kiriansky:2002:SEV,Erlingsson:2006,Yee:2009},
-                profiling~\cite{Harris:2005,Srivastava:1994}, and
-                automatic exploit generation~\cite{Cha:2012}.
+instrumentation
+(\cite{Bruening:CGO2003,PEBIL10,Pin:2005,Valgrind:ENTCS03,DynamoRIO:2004}),
+  binary translation~\cite{UQBT:2000}, software hardening
+  (\cite{Cha:2015,Ford:2008,Zhang,Zhang:2013}), software testing
+  (\cite{Chipounov:2011,Avgerinos:2014,godefroid_automated_2008}), CPU
+  emulation (\cite{QEMU:USENIX05,Magnusson:2002}), malware detection
+  (\cite{Christodorescu:2005,Kruegel:2004,BitBlaze:2008,BAP:CAV11,Egele:USENIX07,Yin:CCS07}),
+  automated reverse engineering
+  (\cite{Cui:2008,Lin:2008,Schwartz:2013,Yakdan2015NDSS,McSema:Recon14,Angr,Radare2}),
+  sand-boxing~\cite{Kiriansky:2002:SEV,Erlingsson:2006,Yee:2009},
+  profiling~\cite{Harris:2005,Srivastava:1994}, and automatic exploit
+  generation~\cite{Cha:2012}.
                
-                 Binary analysis
-                is generally performed by various decompiler projects
-                ~\cite{McSema:Recon14,Remill,Angr1,BAP:CAV11,Radare2}, whose
-                very first step is to translate the machine code to a
-                intermediate representation (IR), and thereby exposing many
-                high-level properties (like control flow, function boundary and
-                    prototype, variable and their type etc.) of the the binary,
-                which  assist further analysis and/or optimization. Formally
-                establishing faithfulness of the decompilation (i.e.
-                    translation from machine code to high level IR) is pivotal
-                to gain trust in any binary analysis. Any bug in the
-                translation would
-invalidate the binary analysis results. 
-For example, a
-malware analysis system might miss vulnerabilities or a binary instrumentation
-system instrumenting a buggy IR might lead to failure or even crash in
-interpreting the instrumented program.
+                 Binary analysis is generally performed by various decompiler
+                 projects
+                 ~\cite{McSema:Recon14,Remill,Angr1,BAP:CAV11,Radare2}, whose
+                 very first step is to translate the machine code to a
+                 intermediate representation (IR), and thereby exposing many
+                 high-level properties (like control flow, function boundary
+                     and prototype, variable and their type etc.) of the the
+                 binary, which  assist further analysis and/or optimization.
+                 Formally establishing faithfulness of the decompilation (i.e.
+                     translation from machine code to high level IR) is pivotal
+                 to gain trust in any binary analysis. Any bug in the
+                 translation would invalidate the binary analysis results.  For
+                 example, a malware analysis system might miss vulnerabilities
+                 or a binary instrumentation system instrumenting a buggy IR
+                 might lead to failure or even crash in interpreting the
+                 instrumented program. Therefore, automatic validation tools
+                 are needed urgently to uncover hidden problems in a binary
+                 translator. 
 
 % What is the current state of the art and why that is insufficient
-Despite of the importance in
-establishing the faithfulness of the binary lifters, there has been
-surprisingly little effort towards that direction. 
-The most notable approaches
-are either based on hardware co-simulation
+Despite of the importance in establishing the faithfulness of the binary
+translators, there has been surprisingly little effort towards that direction.
+The most notable approaches are either based on hardware co-simulation
 testing~\cite{Martignoni:ISSTA2009,Martignoni:ISSTA2010}, which is limited by
 the fact that generating specific test-cases to uncover semantic bugs in a
-lifter is non-trivial, or differential-testing~\cite{Martignoni:ASPLOS2012,ASE2017}, which is limited in terms of coverage of the instructions validated
- and faithfulness guarantees (Refer to
-    Chapter~\ref{sec:related-work}).
+lifter is non-trivial, or
+differential-testing~\cite{Martignoni:ASPLOS2012,ASE2017}, which is limited in
+terms of coverage of the instructions validated and faithfulness guarantees
+(Refer to Chapter~\ref{sec:related-work}). 
 
-%How you plan to improve on the state of the art
-Given the importance  establishing the faithfulness of
-binary lifter (or translator), we propose to employ \tv on binary lifters, as a mean to establish the
+%How you plan to improve on the state of the art Given the importance  in
+%establishing the faithfulness of binary lifter (or translator), 
+We propose to employ \tv on binary lifters, as a mean to establish the
 faithfulness of the translation, by leveraging the semantics of the languages
 involved (e.g. the Intel's X86-64 and the high-level IR).  Given the recent
-advances in translation validation~\cite{Pnueli:1998} in validating compilation~\cite{Necula:2000,Pnueli:1998,Stepp:2011,Tristan:2011,VOC2002,TVOC:CAV2005}, a
-basic version of this strategy is likely quite feasible today, however, there
-are additional challenges to deal with when it comes to validating the
-decompilation pipeline (Refer Section~\ref{sec:challenges}). Moreover, we would like validation
-approach to be general enough and hence applicable to any state-of-the-art
-binary to high-level IR
-translators~\cite{McSema:Recon14,Remill,FCD,reopt,llvm-mctoll,BAP:CAV11,Angr1}, thereby
-avoiding any translator specific customization during validation.  However,
-         having this goal makes the problem even more challenging.
+advances in translation validation~\cite{Pnueli:1998} in validating
+compilation~\cite{Necula:2000,Pnueli:1998,Stepp:2011,Tristan:2011,VOC2002,TVOC:CAV2005},
+  a basic version of this strategy is likely quite feasible today, however,
+  there are additional challenges to deal with when it comes to validating the
+  decompilation pipeline (Refer Section~\ref{sec:challenges}). Moreover, we
+  would like validation approach to be general enough and hence applicable to
+  any state-of-the-art binary to high-level IR
+  translators~\cite{McSema:Recon14,Remill,FCD,reopt,llvm-mctoll,BAP:CAV11,Angr1},
+  thereby avoiding any translator specific customization during validation.
+  However, having this goal makes the problem even more challenging.
 
 We believe that formally validating the translation is more robust as compared
 to (1) validating the translation using random (or low coverage) test-cases,
    and (2) differential testing technique which proves the correctness of a
    translation, generated by a translator, by comparing its behaviors with that
    provided by other translators under test. \cmt{This means, declaring a
-   translation to be correct assumes the correctness of all the translator.}
+     translation to be correct assumes the correctness of all the translator.}
 
 %Summarize your contributions
 \paragraph{Contributions}
 Below are our primary contributions.
 
-\textbf{\emph{Employing \tv on binary translators~}} We propose tools and techniques to
-formally validate the translation from binary to high level IR. To the best of
-our knowledge, we are the first to propose \tv to establish the
+\textbf{\emph{Employing \tv on binary translators~}} We propose tools and
+techniques to formally validate the translation from binary to high level IR.
+To the best of our knowledge, we are the first to propose \tv to establish the
 faithfulness of binary lifters targeting LLVM as their high-level IR.
 
-\textbf{\emph{Translator-agnostic solution~}} We would like our technique to work
-uniformly across translators considering the translators as black-boxes, i.e. without using any translator-generated hints  or
-translator-specific heuristics to assist the validation.
+\textbf{\emph{Translator-agnostic solution~}} We would like our technique to
+work uniformly across translators considering the translators as black-boxes,
+     i.e. without using any translator-generated hints  or translator-specific
+     heuristics to assist the validation.
 
-%In the next section, we elaborate on our motivation to establish faithfulness of binary translators.
-%Why it is important
-%\section{Benefits of Binary Analysis}
+%In the next section, we elaborate on our motivation to establish faithfulness
+%of binary translators.  Why it is important \section{Benefits of Binary
+  %Analysis}
