@@ -174,9 +174,8 @@ smallish binaries. For example, out of $22$ binaries under test, \cmt{only $3$
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Next, we elaborate on the state-of-the-art on various techniques and concepts
-which we borrowed as the basic ingredients to build our approach on. Those
-include Equivalence checking, \TV, and Software Verification.%, and Semantics
-defining frameworks. 
+which we propose to borrow as the basic ingredients to build our approach on. Those
+include Equivalence checking, \TV, and Software Verification, and Machine Learning-Assisted Binary Code Analysis.
 
 \section{Translation Validation}
 
@@ -212,9 +211,9 @@ firstly evaluated symbolically into a series of mutually recursive function
 definitions. A basic block and variable correspondence is inferred by a
 scanning algorithm that traverses the function definitions. The algorithm
 generates both a relation between program points and the accompanying
-constraints between program variables and memory locations for two functions
-when any number of compiler transformations have been applied to the original
-function to produce the transformed function.  T For example, when the scanning
+constraints between program variables and memory at the program point.  
+
+For example, when the scanning
 algorithm visits a branch condition \m{e} in the original program, it
 determines whether \m{e} is eliminated due to the optimizations. If it is
 eliminated, then the information collected is either \m{e = 0} or \m{$\sim$e =
@@ -268,44 +267,22 @@ reflect the effects of the transformation. Thus, in this technique, one needs
 to know what and in which order the transformations are applied by the
 optimizing phase.  
 
+\cmt{ 
 DDEC~\cite{DDEC:OOPSLA:2013} is an data-driven equivalence checker for x86
 loops that uses data collected from test runs rather than inference or hints to
 construct a simulation relation. For evaluation, they prove the equivalence of
 code produced by \textsc{COMPCERT}~\cite{CompCert:FM06} and gcc (with
     otimization enbaled).
+}
+%DDEC~\cite{DDEC:OOPSLA:2013} uses a combination of static analysis and
+%data-driven inference for constructing simulation relations: Static analysis is
+%used to determine the program locations of \syncps and the live
+%variables while the constraints between variables are inferred from execution
+%traces. 
 
- 
-\section{Equivalence Checking}
 
-%\cmt{With the ultimate goal of translation validation for optimizing
-  %compilers,} 
-Iman \etal~\cite{Iman2005} proposed an algorithm for solving the problem of
-finding basic block and variable correspondence between two GCC RTL programs
-compiled from the same source, but using different optimizations.  The essence
-of their technique is interpretation of the two programs on random inputs and
-comparing the histories of value changes for variables. 
-%If a variable \m{x1} in the one program have the same values as a variable
-%\m{x2} in the optimized version for all possible runs of the two programs on
-%the %same input values, then they are defined as corresponding variables.
-If the sequences of value changes of two variables are the same, then the
-variables probably correspond to each other, and the block in which the changes
-occur might also correspond to each other.  However, the paper do not consider
-the VC generation from a given correspondence or proving the VCs.  Moreover,
-    the paper do not try to address any reordering transformation, that is any
-    transformation that changes the order of execution of code, without adding
-    or deleting any executions of any statement. Also, using random values
-    results in poor code coverage which is detrimental to finding variable
-    correspondence. We note that only the basic blocks \m{b1} and \m{b2}, which
-    are covered by the same test input run in original and optimized versions
-    respectively, can be the candidate for correspondence.     
 
-DDEC~\cite{DDEC:OOPSLA:2013} uses a combination of static analysis and
-data-driven inference for constructing simulation relations: Static analysis is
-used to determine the program locations of synchronization points and the live
-variables while the constraints between variables are inferred from execution
-traces.
-
-\section{Machine Learning-Assisted Binary Code Analysis}
+\section{Machine Learning-Assisted Binary Code Analysis}\label{sec:ml}
 
 Jaffe \etal~\cite{Jaffe:2018ICPC} proposes a technique to assign meaningful
 variable names to Hex-ray~\cite{hexray} decompiled C code by learning names

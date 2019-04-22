@@ -1,12 +1,78 @@
-\chapter{Ongoing and Future Work: Translator-agnostic Translation Validation}\label{sec:problem}
-Here is where you discuss the two approaches, using DDEC or machine learning.  But start with a brief paragraph explaining how this fits into the overall approach described in Chapter 4.
-\cmt{ 
-    the two primary goals in mind: (1) Language independence, and (2) Translator
-    independence. 
-}
-\cmt{Both of these approaches  are translator specific and ad-hoc. Whereas,
-    we would like the proof generator to work uniformly across translators.}
-\cmt{However, we want the
-proof generator to be agnostic of the binary-translator involved, which makes
-the problem  even more challenging.}
+\chapter{Ongoing and Future Work: Translator-agnostic Translation
+  Validation}\label{sec:problem} As mentioned in Section~\ref{sec:approach},
+  the notion of equivalence between  binary program and the lifted LLVM IR is
+  formalized as a bi-simulation relation~\cite{Sangiorgi:2011} between pairs of
+  states of the two programs. These program points, also referred to as
+  \syncps, are fed to the equivalence checker as inputs and can
+  be generated, by a proof generator,  as hints by analyzing the translator
+  itself. The translator, being aware of which high-level IR instructions and
+  control points are emitted for each binary instruction, can accurately
+  generate the \syncps. Moreover, each \syncp is
+  labeled with invariants over symbolic variables, corresponding to
+  input/output program states, in order to cover only observably equivalent
+  states. For each \syncp, the equivalence-checker checks
+  equivalence by delegating proof obligations a SMT solver. Failure of a proof
+  obligation can be attributed to either a bug in the translator or  the fact
+  that the source and target programs are not equivalent in the first place. We
+  can rule out the second possibility because the source and target programs
+  are not selected arbitrarily but they are the actual input and output of a
+  translator, under test, and hence claimed to be equivalent by the translator
+  itself.
+ 
+The fact that the proof generator is using the hints provided by the translator
+to  generate the \syncps \& the associated  invariants,  makes it  translator specific, ad-hoc and hence not applicable
+uniformly across translators. We aim for a  binary-translator-agnostic proof
+generator, which, indeed, makes the problem  even more challenging. We would
+like to explore the following two approaches towards that goal.
 
+\paragraph{\textbf{Data-driven \syncp generation}} This approach
+is based on inferring the \syncps using test-runs. There are two
+notable approaches~\cite{Iman2005,DDEC:OOPSLA:2013} along this direction which
+deals with RTL or binary loop optimizations.
+
+Iman \etal~\cite{Iman2005} proposed an algorithm for solving the problem of
+finding basic block and variable correspondence between two GCC RTL programs
+compiled from the same source, but using different optimizations.  The essence
+of their technique is interpretation of the two programs on random inputs and
+comparing the histories of value changes for variables.  If the sequences of
+value changes of two variables are the same, then the variables probably
+correspond to each other, and the block in which the changes occur might also
+correspond to each other. However, as the paper do not consider  generation of verification conditions (VC) at each point of correspondence   or proving the VCs, hence it is difficult to judge 
+on the effectiveness of such correspondence to prove the equivalence of the candidate 
+RTL programs.
+ \cmt{ Moreover, the paper do not try
+to address any reordering transformation, that is any transformation that
+changes the order of execution of code, without adding or deleting any
+executions of any statement. Also, using random values results in poor
+  code coverage which is detrimental to finding variable correspondence. We
+    note that only the basic blocks \m{b1} and \m{b2}, which are covered by the
+    same test input run in original and optimized versions respectively, can be
+    the candidate for correspondence.}   
+
+
+%DDEC~\cite{DDEC:OOPSLA:2013} uses a combination of static analysis and
+%data-driven inference for constructing simulation relations: Static analysis is
+%used to determine the program locations of \syncps and the live
+%variables while the constraints between variables are inferred from execution
+%traces. 
+
+
+Rahul \etal~\cite{DDEC:OOPSLA:2013} presented ``data-driven equivalence checker'' (DDEC) to check equivalence of two x86 loops which uses data-driven inference in order to guess candidate simulation relations\footnote{A simulation relation consist of pair of program cutpoints, which breaks two loops into a set of pairs of loop-free code fragments and  linear equalities as invariants to hold at those cutpoints.}. Their approach does not assume any knowledge about the optimization performed while determining those simulation relations. The candidate simulation relations are checked using an SMT solver to determine equivalence of the loops. The cutpoints are chosen where the corresponding memory states agree on the largest number of values. The equality conditions   at cutpoint is determined by using standard linear algebra techniques over the values of live variables recorded by inserting instrumentation. Moreover, DDEC is sound; a lack of test coverage may cause equivalence checking to fail, but it cannot result in the unsound conclusion that two loops are equivalent when they are not. \cmt{However, while DDEC is trying to prove that two x86 loops are equivalent, the proof obligation might fail because  of one or more of the following reasons: (1 ) If satisfactory cutpoints are not found, (2) If spurious equality relationships are produced as invariants, (3) There is a bug in the translator, and (4) The target and the rewrite are not equivalent in the first place. The attribution of failure reason seems non-trivial and could affect fully automatic application of the approach.}   
+
+Our approach is based on the insight that a sound guess of synchronization
+points do not result in proving two programs equivalent when they are not
+(false positives). Indeed, they might produce false negatives. Having said
+that, given  \ISA and translated LLVM programs, we might compile the LLVM
+program to binary and use the data-driven approach~\cite{DDEC:OOPSLA:2013}, mentioned above, to extract guesses of
+\syncps. However, we do not want to add the compilation in our
+trust base and hence we can map the \syncps back to the IR level
+and employ the equivalence checker \m{Keq} to proof the equivalence of the resulting
+LLVM IR and the original binary using the \syncp guesses. However, these \syncp, being data-driven guesses, may lead to failing the proof obligations for reasons other that a translation error. For example, the proof might fail if the spurious invariants are generated or the \syncps are not sufficient, and it is highly non-trivial to automatically attribute the failure reasons. 
+
+There is a trade-off between translator-specific and translator-agnostic proof generator approaches. The \syncps generated by the former is accurate, leading to trivial and automatic attribution of proof failure reason. On the other hand, the \syncp guesses produced by the  translator-agnostic proof generator has issues with automatic attribution  of the failure reasons. We envision opportunities to exploit this trade-off by pruning off \syncp  guesses which a translator specific proof generator will never generate and that way can extract the best of both the worlds. 
+
+\paragraph{\textbf{Learning \syncps}}
+
+As discussed in Section~\ref{sec:ml}, there exist many recent efforts~\cite{Jaffe:2018ICPC,Rosenblum2007,Rosenblum:2008,Rosenblum:2010,Rosenblum:2011,Bao:2014,Shin:2015} in extracting various features (like meaningful variable names, compiler provenance, function entry points) suing machine learning techniques which are useful for binary analysis. Most notable is the novel technique presented by Katz \etal~\cite{katz2018rnn}  for decompiling binary code snippets using a model based on Recurrent Neural Networks. The model learns properties and patterns that occur in source code and uses them to produce decompilation output. There results suggest that the technique is better at recovering syntactic structure than variable and function names and can be used to obtain an high level structural  overview of the decompilation.
+    
+Given such recent advances, we believe that the use of machine learning in order to infer the \syncp is a promising direction to explore.

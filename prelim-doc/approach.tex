@@ -130,34 +130,26 @@ the lifted LLVM IR code, we decided to build on K~\cite{k-primer-2013-v32}.
 
 In formal methods literature, the notion of program (or semantic) equivalence
 is usually formalized as a bi-simulation relation~\cite{Sangiorgi:2011} between
-pairs of states of the two programs that are subject to prove equivalence.
+pairs of states of the two programs.
 Ideally, we want a bi-simulation variant that allows us to simply relate the
 states where the two programs actually synchronize, i.e., at the start of
-corresponding functions or basic blocks, at the loop headers, etc. We proposed to borrow the novel concept of bisimulation, called \emph{cut-bisimulation}, from
-~\cite{TheoSAS19}.  Cut-bisimulation is well-suited for translation  across
+corresponding functions or basic blocks, at the loop headers, etc. Such related states are called \syncps, which are a pair of symbolic states of the input and output programs accompanied by a set of equality constraints over symbolic variables found in the two states. Kasampalis \etal~\cite{TheoSAS19} realized such a variant of bi-simulation, referred to as  \emph{cut-bisimulation}, which is  well-suited for translation  across
 language changes, as it can ignore program points of no interest in the input
-and/or output program.\Comment{Brief the concept}
+and/or output program.
 %
 
 As for the last ingredient of a \TV system, we would like to design proof
 generator and the checker with language-independence in mind.
 Language-independence makes them applicable for (1) different source (\ISA) and
-translated (high-level-IR) language, and (2) different high-level translated
+translated program ( the high-level-IR), and (2) different high-level translated
 IRs (like LLVM, BIL etc.) supported by different binary lifters.  Towards that
 goal, we proposed to borrow a language-independent equivalence checking
-algorithm~\cite{TheoSAS19} that can be parameterized with the input and output
+algorithm \m{Keq}~\cite{TheoSAS19} that can be parameterized with the input and output
 language semantics. The algorithm employs the notion of cut-bisimulation,
-         mentioned above, and the program point pairs needed for the proof are
-         provided  as an input to the algorithm, and are called synchronization
-         points. \cmt{Intuitively, synchronization points are symbolic
-           descriptions that capture the set of pairs of relevant (concrete)
-             states of the input and output programs.}
-
- The above equivalence checking algorithm is implemented using the \K
- framework~\cite{k-primer-2013-v32}, in a tool we call \m{Keq} that accepts
- formal semantic definitions for the input and output languages. The
- synchronization points, as provided to the tool as an input, are generated as  hints by the translator itself.
- 
+         mentioned above, and the \syncp  needed for the proof are
+         provided  as an input to the algorithm. Keq is robust enough to apply to the Instruction Selection (ISel) phase of LLVM to validate the translation from LLVM IR to the output of the ISel phase, called Virtual x86. 
+  
+ % X86
  The \m{Keq} tool, being parametric on the semantics of the input/output languages, need to be provided the semantics of LLVM and \ISA as inputs. Given the size and the complicity of the \ISA specification, providing the \ISA semantics is a non-trivial task which deters many previous efforts from using semantics driven approach to validate the binary translation. We are the first to develop 
  the most complete and thoroughly tested formal
  semantics of \ISA to date (Refer Section~\ref{sec:results}). Our semantics faithfully formalizes all the non-deprecated, sequential user-level instructions
