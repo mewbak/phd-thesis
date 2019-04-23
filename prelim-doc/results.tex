@@ -1,6 +1,6 @@
 \chapter{Formal Semantics of \ISA User-Level ISA}\label{sec:results}
-The equivalence checker being parametric on the semantics of source (\ISA) and target (LLVM) languages of decompilation, one of the important steps towards the goal is to define these semantics. In this section, we will discuss our contribution is coming up with the most complete and thoroughly tested formal
-semantics of x86-64 to date. which got recently published in PLDI'19~\cite{DasguptaAdve:PLDI19}.
+The equivalence checker being parametric on the semantics of source (\ISA) and target (LLVM) languages of decompilation, one of the important steps towards the goal is to define these semantics. In this section, we will discuss our published contribution~\cite{DasguptaAdve:PLDI19} is coming up with the most complete and thoroughly tested formal
+semantics of x86-64 to date.
 
 
 \section{Challenges in Formalizing \ISA}
@@ -20,7 +20,7 @@ It consists of \totalIntel{} mnemonics, and each mnemonic admits several variant
 \paragraph{Inconsistent Instruction Variants:}
 %
 Some variants have divergent behaviors more than the difference of their type and size. For example, \instr{movsd}, one of the 128-bit SSE instructions, has very different behaviors depending on whether the type of the source operand is register or memory; it clears the higher 64 bits of the target register only when the source type is memory.
-Indeed, we revealed bugs in other semantics due to their incorrect generalization of the variants' behavior (Details in Section ~\ref{sec:Approach}, Instruction Variants).
+Indeed, we revealed bugs in other semantics due to their incorrect generalization of the variants' behavior.
 
 \paragraph{Ambiguous Documentation:}
 %
@@ -95,7 +95,7 @@ We then manually added \K rules for the remaining 40\% of the target instruction
 %
 The outcome was a complete formal specification of user-level \ISA in \K.
 
-We validated this semantics in three ways, as described in Section~\ref{sec:Eval}.
+We validated this semantics in three ways:
 %
 First, we use the \K interpreter to execute the semantics of \emph{each} instruction for 7,000+ test inputs (each input is a processor state configuration) and compared the output directly with the hardware behavior for the same instruction.
 %
@@ -103,9 +103,48 @@ Second, we repeated this experiment using the applicable programs in the \SC{GCC
 %
 Third, we compared against the semantics defined in the Stoke project for about 330 instructions that were omitted in Strata (thus not included in our baseline), using an SMT solver.
 
-These validation experiments uncovered bugs~\cite{BugIntel,BugStoke983,BugStoke986} in the Intel manual, in Strata's simplification rules, and in the Stoke semantics.  All these bugs were reported to the respective authors, and most have been acknowledged and some have been fixed.
+These validation experiments uncovered bugs~\cite{BugIntel,BugStoke983,BugStoke986} in the Intel manual, in Strata's simplification rules, and in the Stoke semantics.  All these bugs were reported to the respective authors, and most have been acknowledged and some have been fixed. Following is the brief summary of inconsistencies we found during the validation experiments.
 
-We illustrate the potential of our semantics to be used for formal analyses such as deductive program verification and program equivalence checking.
+\paragraph{Inconsistencies Found in the Intel Manual}
+According to the manual, the semantics of \instr{vpsravd} \instr{\%xmm3,} \instr{\%xmm2,} \instr{\%xmm1} seems to depend on the lower $100$ bits of \reg{xmm3}, whereas the actual hardware execution suggests that it should depend on the lower $128$ bits. Similar inconsistencies are found in instructions with mnemonics \instr{vpsllvd}, \instr{vpsllvq}, \instr{vpsravd}.
+Also, we found misleading typos related to instructions with opcodes \instr{vpsravw}, \instr{vpsravd}, \instr{vpsravq}, \instr{packsswb}.    
+All these findings were reported and acknowledged by Intel as issues in the manual~\cite{BugIntel}.
+
+\paragraph{Inconsistencies Found in \Strata's Simplification Rules}
+While testing the instructions specifications borrowed from \Strata, we found inconsistent behaviors with the actual hardware. Moreover, the inconsistencies were discovered in the formulas of floating-point instructions. This is not surprising because \Strata models the floating-point instructions as \uif{} which cannot be executed or tested on hardware. Their semantics are executable in our definition though, and thus we were able to test them thoroughly. Note that Strata generates the formulas for these instructions by symbolically  executing  the corresponding learned  instruction sequences followed by a formula simplification pass. Therefore, errors in those formulas can be due to bugs either in the symbolic execution engine or in the simplification stage. Our testing shows that the second is true with the following evidence.
+The simplification rule \s{add\_double(A, 0) == A} does not hold for \s{A = $-0.0$}. Same for \s{add\_single}. These were reported~\cite{PC1}.
+Also, the simplification rule \s{sub\_double(A, A) == 0} does not hold for \s{A = $NaN$}.  Same is true for \s{sub\_single}. We found this bug in the  branch of Stoke which is used in \Strata. But this has been already fixed in the latest \Stoke branch.
+
+\paragraph{Inconsistencies Found in \Stoke}
+
+First, for instructions like \instr{addsubpd \%xmm1, \%xmm2} , the order of addition and subtraction specified by \Stoke is opposite to the one specified in the Intel Manual. Same is true with the mnemonic \instr{addsubps}. (Found in $12$ instruction variants.)
+
+Second, the instruction \instr{pslld \%xmm1, \%xmm2} implements a logical left shift of packed data by a count specified in \reg{xmm1}. \Stoke's specification vectorized the operand \reg{xmm1} which is incorrect according to the manual. Similar issues were found in instructions implementing the logical right shift operations on packed data. (Found in  $18$ instructions.)
+
+Third, \instr{cvtsi2sdl} \instr{\%eax,} \instr{\%xmm1} and \instr{vcvtsi2sdl} \instr{\%eax,} \instr{\%xmm0,} \instr{\%xmm1} are respectively SSE- and AVX-versions of the instruction to  convert a double-word ($32$-bit) integer to a scalar single-precision floating-point value. According to the manual, in the AVX-version,  the  destination bits $127-64$ of the  register \reg{xmm1} are updated to the corresponding bits in the first source operand \reg{xmm0}. This  is in contrast to the SSE-version of the instruction where the destination bits $127-64$ should remain unmodified. \Stoke specifies the semantics of the AVX-version similar to the SSE-version, which is incorrect.  (Found in $4$ instruction variants.)
+
+Finally, some instructions, like \instr{imulb \%al}, which drive flag registers to an undefined state are not modeled correctly in \Stoke.    (found in $8$ instruction variants)
+
+All these errors were reported and confirmed~\cite{BugStoke983,BugStoke986}.
+
+\vspace{4pt}
+Moreover, we illustrate the potential of our semantics to be used for formal analyses such as deductive program verification and program equivalence checking. For example, following are the three applications that we demonstrated:
+
+\paragraph{Program Verification} To demonstrate that our semantics can be used to verify
+x86-64 programs, we use the x86-64 verifier to prove the
+functional correctness of the sum-to-n program. The functional correctness
+property, which is $return-value = \sum_1^N n = N (N + 1) / {2}$ is specified as reachability specifications, essentially a pair of pre- and post-conditions for the function computing the sum-to-n.
+
+\paragraph{Symbolic Execution to find Security Vulnerability}
+\K automatically derives a correct-by-construction symbolic execution engine from the given semantics.
+Being instantiated with our semantics, the engine can be used to symbolically execute and explore all possible paths in the given \ISA program.
+We demonstrated how this capability can be used to find a  security vulnerability. We took a known security vulnerability using a code snippet of the HiStar~\cite{HiStar:2006} kernel. Using symbolic execution, we derive a path condition which can trigger the  vulnerability along with the triggering inputs.
+
+\paragraph{Translation Validation of Optimizations}
+\K also provides a program equivalence checker that can be used for the translation validation of compiler optimizations.
+We derived an \ISA program equivalence checker from our semantics and used it to validate different optimizations of \s{popcnt} program which counts the number of set bits in the given input. We compiled the program with different optimizations: the GCC compiler optimizations (-O0, -O1, -O2, and -O3), and the Stoke super-optimization. We validated these optimizations by checking the equivalence between the optimized programs.
+
+
 The \K framework also enables one to represent our semantics as SMT theories, which allows others to easily reuse our semantics for their own purposes.
 \SC{%
     Indeed, we have translated our semantics to Stoke~\cite{completing-stock} which can serve as a drop-in replacement of Heule~\etal's semantics~\cite{Heule2016a} and can immediately benefit tools built on Stoke (e.g., \cite{Roessle:CPP19}).
@@ -114,3 +153,5 @@ The \K framework also enables one to represent our semantics as SMT theories, wh
 % \paragraph{Artifacts}
 
 Our formal semantics is publicly available at~\cite{x86-64-github}.
+
+

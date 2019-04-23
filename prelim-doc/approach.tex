@@ -50,7 +50,7 @@ semantics framework need to be general enough to model programs written in
 different languages.
 
 One of the long standing challenge, which deters many previous efforts like
-~\cite{ASE2017}, in employing a formal validation approach in validating binary
+~\cite{ASE2017}, in employing a formal validation approach for binary
 lifters, is the lack of formal specification of the \ISA instructions
 specifying binary program. \ISA instruction are massive in both numbers and
 complexity and are specified in an informal manner in the Intel
@@ -88,7 +88,7 @@ compilation~\cite{VOC2002,TVOC:CAV2005,Necula:2000,Sewell:2013,Kundu:2009,Kedar:
     Naive approaches, like identifying and/or pruning glue code added during
     decompilation or to make the equivalence checker aware of the optimizations
     performed by the decompiler, might work for a specific decompiler but,
-    being ad-hoc, will not be easily scalable to others.  
+    being ad-hoc, will not be easily scalable to others. \cmt{Also, Binary decompilation in the presence of indirect calls makes the control-flow-recovery challenging.    }
       
 
 \subsection{Providing automated proof generator and checker} This ingredient is
@@ -100,16 +100,16 @@ equivalence between synchronization points which are symbolic descriptions that
 capture the set of pairs of relevant states of the input and output programs.
 One of the essential requirements of the equivalence checker,  in the context
 of binary lifting, is language independence, so as  to proof equivalence
-between programs in different languages (like \ISA and LLVM). Moreover, the
+between programs in different languages (like \ISA and LLVM). \cmt{Moreover, the
 proof generator has to take into account the specifics of the translation which
 could be achieved by using translator-generated hints or heuristics inspired by
-the translation's effect. 
+the translation's effect. }
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Proposed Approach}\label{sec:approach} In this section we would
 outline our setup to validate the translation from \ISA program to LLVM IR and
-propose solution to mitigate the challenges mentioned in
+propose solution to mitigate some of the challenges mentioned in
 Section~\ref{sec:challenges}.
 
 

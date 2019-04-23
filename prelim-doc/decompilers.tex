@@ -1,39 +1,38 @@
-\chapter{Background on Decompilers: Facilitating Binary Analysis}\label{sec:decompilers}
-
-Analysis and reasoning about source code is one of the most pervasive concepts
-in computer science research. Analyzing the code to approximate  the semantics
-of the program helps in determining the correctness of the program as per some
-gold standard or determining illegal memory and control flow accesses, or
-proving/refuting various properties of interest to the users. Static
-analysis~\cite{Nielson2010}, model checking~\cite{Clarke1981,Queille1982}, and
-abstract interpretation~\cite{Cousot1977} are the well known techniques used,
-         widely and with ease, for the  analysis of source code and have been
-         deployed in many tools and processes that improve the software
-         quality~\cite{Xie:2003,Musuvathi:2008,Ivancic:2005,Dwyer:2007,Binkley:2007,Bessey2010,Ball2006}.
-         Once the software, written in some high-level language, is compiled
-         into binary format and shipped, the users down the line have to trust
-         the vendor and the distributors about the quality and security of the
-         product. Even when the distributors can be trusted, the compilation
-         pipeline might introduce a bug in the binary and hence ensuring trust
-         in the binary requires the compiler to be in the trusted computing
-         base.  All the static source code analysis techniques, mentioned
-         above, are targeted to human readable source code written in high
-         level languages as apposed to low level binary code. Analysis at the
-         binary level is difficult mainly because many source level
-         information, e.g. loops, procedures, or classes which provides a
-         natural structural partitioning of programs into functionally related
-         units and assist source level analysis, are completely or partially
-         lost during the compilation process. Moreover, some source level
-         information, like symbol information, types, function boundaries and
-         their prototypes, which creates a logical view of the program  within
-         a structural partition, is also stripped off during the compilation
-         process. Absence of symbol information and types means that variables
-         are not easily identified, but are represented by reusable registers
-         and the memory, which is addressable as a large continuous array.
-         Registers and memory carry no type information, and pointers of any
-         type are indistinguishable from integers.  Despite of these
-         difficulties, there are several compelling reasons to do analysis at
-         the binary level, We enumerate the most important ones as follows:
+\chapter{Background on Decompilers: Facilitating Binary
+  Analysis}\label{sec:decompilers} Analysis and reasoning about source code is
+  one of the most pervasive concepts in computer science research. Analyzing
+  the code to approximate  the semantics of the program helps in determining
+  the correctness of the program w.r.t some gold standard or determining
+  illegal memory and control flow accesses, or proving/refuting various
+  properties of interest to the users. Static analysis~\cite{Nielson2010},
+  model checking~\cite{Clarke1981,Queille1982}, and abstract
+  interpretation~\cite{Cousot1977} are the well known techniques used, widely
+  and with ease, for the  analysis of source code and have been deployed in
+  many tools and processes that improve the software
+  quality~\cite{Xie:2003,Musuvathi:2008,Ivancic:2005,Dwyer:2007,Binkley:2007,Bessey2010,Ball2006}.
+  \cmt{Once the software, written in some high-level language, is compiled into
+    binary format and shipped, the users down the line have to trust the vendor
+      and the distributors about the quality and security of the product. Even
+      when the distributors can be trusted, the compilation pipeline might
+      introduce a bug in the binary and hence ensuring trust in the binary
+      requires the compiler to be in the trusted computing base.}  All such
+      static source code analysis techniques are targeted to human readable
+      source code written in high level languages as apposed to low level
+      binary code. Analysis at the binary level is difficult mainly because
+      many source level information, e.g. loops, procedures, or classes which
+      provides a natural structural partitioning of programs into functionally
+      related units \cmt{and assist source level analysis,} are completely or
+      partially lost during the compilation process. Moreover, some source
+      level information, like symbol information, types, function boundaries
+      and their prototypes, which creates a logical view of the program  within
+      a structural partition, is also stripped off during the compilation
+      process. Absence of symbol information and types means that variables are
+      not easily identified, but are represented by reusable registers and the
+      memory, which is addressable as a large continuous array.  Registers and
+      memory carry no type information, and pointers of any type are
+      indistinguishable from integers.  Despite of these difficulties, there
+      are several compelling reasons to do analysis at the binary level, We
+      enumerate the most important ones as follows:
 
 \begin{itemize}
     
@@ -66,16 +65,19 @@ abstract interpretation~\cite{Cousot1977} are the well known techniques used,
     level alleviates the need to trust the correctness of the compiler.
     Moreover, during the compilation process, the source code undergoes many
     modification, removal or additions, before translated to binary and
-    analyzing that binary is desirable because it is what is executed on
-    hardware~\cite{WYSINWYE}.  \cmt{ \item Binary analysis is heavily leveraged
-      by various tools, ranging from software emulation and
-        virtualization~\cite{QEMU:USENIX05,Valgrind:ENTCS03,DynamoRIO:2004,Pin:2005},
-        malware
-          analysis~\cite{BitBlaze:2008,BAP:CAV11,Egele:USENIX07,Yin:CCS07},
-        reverse engineering~\cite{McSema:Recon14,Angr,Radare2},
-        sand-boxing~\cite{Kiriansky:2002:SEV,Erlingsson:2006,Yee:2009}, and
-          profiling~\cite{Harris:2005,Srivastava:1994}, in order to improve
-          their performance and reliability.} \end{itemize}
+    analyzing that binary is desirable because it is what is actually executed on
+    hardware~\cite{WYSINWYE}. 
+    
+%     \item Binary analysis is heavily leveraged by various tools, ranging from
+%     software emulation and
+%     virtualization~\cite{QEMU:USENIX05,Valgrind:ENTCS03,DynamoRIO:2004,Pin:2005},
+  %     malware
+  %     analysis~\cite{BitBlaze:2008,BAP:CAV11,Egele:USENIX07,Yin:CCS07},
+  %     reverse engineering~\cite{McSema:Recon14,Angr,Radare2},
+%        sand-boxing~\cite{Kiriansky:2002:SEV,Erlingsson:2006,Yee:2009}, and
+%        profiling~\cite{Harris:2005,Srivastava:1994}, in order to improve
+%        their performance and reliability.
+\end{itemize}
 
 Binary analysis is not easy~\cite{Meng:2016} and few long standing challenges
 can be enumerated as follows:
@@ -97,8 +99,7 @@ impressive amount of work to rebuild a close approximation of the high-level
 source code from a compiled binary using various decompilation
 frameworks~\cite{McSema:Recon14,Remill,Angr1,BAP:CAV11,Radare2,FCD,BitBlaze:2008,hexray,Fokin:2011,eschulte2018bed,katz2018rnn,Schwartz:2013,IDA,mctoll,revgen}.
 
-Binary analysis using a decompilation framework is achieved by (1) Binary
-decompilation/lifting: Translating machine code to a intermediate
+Binary analysis using a decompilation framework is achieved by (1) Translating machine code to a intermediate
 representation (IR), which precisely represents the operational semantics of
 the binary code. The lifted IR exposes many high-level properties (like control
     flow, function boundary and prototype, variable and their type etc.) of the

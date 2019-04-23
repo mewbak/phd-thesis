@@ -22,14 +22,14 @@ instrumentation
                  very first step is to translate the machine code to a
                  intermediate representation (IR), and thereby exposing many
                  high-level properties (like control flow, function boundary
-                     and prototype, variable and their type etc.) of the the
+                     and prototype, variable and their type etc.) of the
                  binary, which  assist further analysis and/or optimization.
                  Formally establishing faithfulness of the decompilation (i.e.
                      translation from machine code to high level IR) is pivotal
                  to gain trust in any binary analysis. Any bug in the
                  translation would invalidate the binary analysis results.  For
                  example, a malware analysis system might miss vulnerabilities
-                 or a binary instrumentation system instrumenting a buggy IR
+                 or a binary instrumentation system, instrumenting a buggy IR,
                  might lead to failure or even crash in interpreting the
                  instrumented program. Therefore, automatic validation tools
                  are needed urgently to uncover hidden problems in a binary
@@ -39,12 +39,12 @@ instrumentation
 Despite of the importance in establishing the faithfulness of the binary
 translators, there has been surprisingly little effort towards that direction.
 The most notable approaches are either based on hardware co-simulation
-testing~\cite{Martignoni:ISSTA2009,Martignoni:ISSTA2010}, which is limited by
-the fact that generating specific test-cases to uncover semantic bugs in a
-lifter is non-trivial, or
-differential-testing~\cite{Martignoni:ASPLOS2012,ASE2017}, which is limited in
-terms of coverage of the instructions validated and faithfulness guarantees
-(Refer to Chapter~\ref{sec:related-work}). 
+testing~\cite{Martignoni:ISSTA2009,Martignoni:ISSTA2010}, which is limited
+because generating specific test-cases to uncover semantic bugs in a lifter is
+non-trivial, or differential-testing~\cite{Martignoni:ASPLOS2012,ASE2017},
+  which is limited in terms of coverage of the instructions validated and
+  faithfulness guarantees it provides (Refer to
+      Chapter~\ref{sec:related-work}). 
 
 %How you plan to improve on the state of the art Given the importance  in
 %establishing the faithfulness of binary lifter (or translator), 
@@ -59,8 +59,9 @@ compilation~\cite{Necula:2000,Pnueli:1998,Stepp:2011,Tristan:2011,VOC2002,TVOC:C
   would like validation approach to be general enough and hence applicable to
   any state-of-the-art binary to high-level IR
   translators~\cite{McSema:Recon14,Remill,FCD,reopt,llvm-mctoll,BAP:CAV11,Angr1},
-  thereby avoiding any translator specific customization during validation.
-  However, having this goal makes the problem even more challenging.
+  thereby avoiding any translator specific customization during validation
+  (Refer Chapter~\ref{sec:future}).  However, having this goal makes the
+  problem even more challenging.
 
 We believe that formally validating the translation is more robust as compared
 to (1) validating the translation using random (or low coverage) test-cases,

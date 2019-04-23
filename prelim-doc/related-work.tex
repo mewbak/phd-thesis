@@ -1,8 +1,7 @@
 \chapter{Related Work}\label{sec:related-work}
 
 Given the importance in establishing the faithfulness of the binary lifters,
-      there has been couple of efforts towards that direction, which we are
-      going to elaborate in the next section.
+      there has been a couple of efforts towards that direction, which we will elaborate next.
 
 \section{Recent Advances in Validation of Decompilation}\label{sec:recent-advances}
 All the previous approaches can be broadly categorized to be based on (1)
@@ -10,7 +9,7 @@ All the previous approaches can be broadly categorized to be based on (1)
 
 \subsection{Approaches using Simulation-Testing}
 This approach is similar to black-box testing in software engineering. Most
-notable work along this line of approach is that of Martignoni et
+notable work include Martignoni et
 al.~\cite{Martignoni:ISSTA2009, Martignoni:ISSTA2010,Martignoni:ASPLOS2012} and
 Chen \etal~\cite{CLSS2015}.
 
@@ -18,7 +17,7 @@ Chen \etal~\cite{CLSS2015}.
 Martignoni et al.~\cite{Martignoni:ISSTA2009, Martignoni:ISSTA2010} proposes
 hardware-cosimulation based testing on QEMU~\cite{QEMU:USENIX05} and
 Bochs~\cite{Bochs1996}.  Specifically, they compared the state between actual
-CPU and each IA-32 CPU emulator (under test) after executing randomly selected
+CPU and  IA-32 CPU emulator (under test) after executing randomly selected
 test-inputs on randomly chosen instructions  to discover any semantic
 deviations.
 %Specifically, they compared the state between a physical and an emulated CPU
@@ -34,11 +33,9 @@ Chen \etal~\cite{CLSS2015} proposed validating the static binary translator
 LLBT~\cite{LLBT2012} and the hybid binary translator~\cite{LLVMDBT2012},
   translating ARM programs to x86 programs using the LLVM x86 backed. First, an
   ARM program is translated offline to x86 program. Next, the translated x86
-  binary runs directly on an x86 system while the original ARM binary runs on
-  an ARM emulator tool, QEMU. During run time, both the ARM binary and the
+  binary is executed  directly on an x86 system while the original ARM binary runs on the QEMU emulator. During run time, both the ARM binary and the
   translated x86 binary produce a sequence of  architecture states, which are
-  compared, once for each instruction or once per each basic block, for any
-  disagreements. They evaluate their validator using the ARM code compiled from
+  compared at the granularity of single instruction or single basic block. They evaluate their validator using the ARM code compiled from
   EEMBC 1.1 benchmark. 
 %%
 
@@ -48,10 +45,10 @@ complete in terms of instructions coverage of IA-32 ISA and faithful, to
 generate high-quality test cases to validate  a Lo-Fi
 emulator~\cite{QEMU:USENIX05}, defined as less complete and buggier emulator.
 The validation works as follows: A randomly chosen binary instruction is
-executed twice, once on real hardware and next on the Lo-Fi emulator, and the
+executed twice, once on a real hardware and next on the Lo-Fi emulator, and the
 output states are matched.
 %
-Note that, even\Comment{check} though Martignoni
+Note that, even though Martignoni
 \etal~\cite{Martignoni:ASPLOS2012} symbolically explored the test-cases which
 is supposed to cover all the paths of a given instruction's implementation, but
 being a differential testing-based approach, the faithfulness depends directly
@@ -62,8 +59,8 @@ the Low-Fi emulator.
 %
 Moreover, the symbolic execution of an instruction's implementation in the
 Hi-Fi emulator is achieved using an X86 interpreter FuzzBALL. A bug in the
-later will effect the generation of high-fidelity test cases for a particular
-instruction, leading to incomplete coverage of the instruction's implementation
+interpreter will effect the generation of high-fidelity test cases for a particular
+instruction, leading to incomplete coverage of that instruction's implementation
 in Low-Fi emulator.
 %
 \cmt{However, their approach does not consider the floating point instruction
@@ -101,15 +98,15 @@ in Low-Fi emulator.
 %    help much in finding such bugs.
 
 \subsection{Using Formal Methods}
-Another direction to establish guarantees in the binary translation is by using
+Another direction to establish strong guarantees in the binary translation is by using
 formal methods. The most notable efforts along the direction are that of Soomin
 \etal~\cite{ASE2017}, Myreen et al.~\cite{Myreen:FMCAD:2008,Myreen:FMCAD:2012}
 and Fr\c{e}d\c{e}ric \etal~\cite{inlineassm}.
 %%
 
-MeanDiff~\cite{ASE2017} proposed a N-version IR testing to test three binary
+MeanDiff~\cite{ASE2017} proposed a N-version IR testing to validate three binary
 lifters, BAP~\cite{BAP:CAV11}, BINSEC~\cite{BINSEC2011}, and PyVEX~\cite{PYVEX}
-translating a single binary instruction  to BIL, DBA, and VEX IRs respectively.
+by comparing their translation of a single binary instruction to BIL, DBA, and VEX IRs respectively.
 The tools symbolically execute each of the IR instances, lifted from a single
 binary instruction, to generate symbolic summaries to be compared using a SAT
 solver. MeanDiff neither handle floating point operations, nor the instructions
@@ -121,7 +118,7 @@ cannot guarantee that all the lifters are faithful in lifting that instruction,
        which is however, a general limitation of differential testing based
        approach. Also, as MeanDiff is testing multiple binary lifters
        together, hence it cannot be used to establish the faithfulness in
-       lifting the semantics of an instruction which is not implemented in one
+       lifting the semantics of an instruction which is not implemented in any one
        of them.
 %%
 
@@ -142,12 +139,11 @@ binary translation, for example, MeanDiff~\cite{ASE2017} has demonstrated how
 symbolic summaries can be help in N-version equivalence testing of binary
 lifters. However, they compared the summaries corresponding to a single
 instruction at a time. Myreen et al.~\cite{Myreen:FMCAD:2008,Myreen:FMCAD:2012}
-extracted function-level symbolic summaries which sounds as a promising
-building block towards establishing correctness of binary  lifters. However,
-         the later has many additional challenges to deal with (Refer
-             Section~\ref{sec:challenges}). Moreover, both Myreen et al. and
+extracted function-level symbolic summaries which indeed is a promising
+building block towards establishing correctness of binary lifters.\cmt{, which, however,  has many additional challenges to deal with (Refer
+             Section~\ref{sec:challenges}). Moreover,} However, both Myreen et al. and
          Roessle et al. have limited \ISA instruction set coverage, which
-         restricts their application on real-world binaries.
+         might restricts their application on many  real-world binaries.
 
 
 \subsection{Using Machine Learning} Another recent work by Schulte
@@ -160,17 +156,17 @@ byte-equivalence w.r.t the target binary. The byte equivalence  is simply the
 edit distance to the target binary. As hypothesized in the future work section
 of the paper~\cite{eschulte2018bed}, BED could be applied to LLVM IR instead of
 C to evolve lifting from machine code to LLVM IR and may work well due to the
-relative simplicity of LLVM IR as compared to the C. Being byte-equivalent the
+relative simplicity of LLVM IR as compared to the C. Being byte-equivalent, the
 generated LLVM IR will be the faithful evolution from the machine code.
 However, as shown in the paper, this approach worked moderately well for
-smallish binaries. For example, out of $22$ binaries under test, \cmt{only $3$
-  achieve full byte equivalence when the initial population does not includes
-    decompiler seeds, and} $4$ achieve full byte equivalence when the initial
-    population included decompilation candidates from the
+smallish binaries. For example, out of $22$ binaries under test, only $4$ achieve full byte equivalence when the initial
+    population is augmented with decompilation candidates from the
     HEX-RAYS~\cite{hexray} Decompiler. It is still an open problem to realized
     an end-end byte-equivalent binary to LLVM decompiler using purely genetic
     optimization algorithm. 
-
+\cmt{only $3$
+    achieve full byte equivalence when the initial population does not includes
+    decompiler seeds, and} 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 Next, we elaborate on the state-of-the-art on various techniques and concepts
