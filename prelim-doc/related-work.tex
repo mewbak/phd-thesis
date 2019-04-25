@@ -1,7 +1,7 @@
 \chapter{Related Work}\label{sec:related-work}
 
 Given the importance of establishing the faithfulness of the binary lifters,
-      there exits a couple of efforts towards that direction, which we will elaborate on next.
+      there exists a couple of efforts towards that direction, which we will elaborate on next.
 
 \section{Recent Advances in Validation of Decompilation}\label{sec:recent-advances}
 All the previous approaches can be broadly categorized to be based on (1)
@@ -33,7 +33,7 @@ Chen \etal~\cite{CLSS2015} proposed validating the static binary translator
 LLBT~\cite{LLBT2012} and the hybrid binary translator~\cite{LLVMDBT2012},
   translating ARM programs to x86 programs using the LLVM x86 backend. First, an
   ARM program is translated offline to x86 program. Next, the translated x86
-  binary is executed  directly on an x86 system while the original ARM binary runs on the QEMU emulator. During run time, both the ARM binary and the
+  binary is executed  directly on a x86 system while the original ARM binary runs on the QEMU emulator. During run time, both the ARM binary and the
   translated x86 binary produce a sequence of  architecture states, which are
   compared at the granularity of single instruction or single basic block. They evaluate their validator using the ARM code compiled from
   EEMBC 1.1 benchmark. 
@@ -59,7 +59,7 @@ the Low-Fi emulator\footnote{We note that our proposed semantics-driven \tv appr
 %
 Moreover, the symbolic execution of an instruction's implementation in the
 Hi-Fi emulator is achieved using an X86 interpreter FuzzBALL. A bug in the
-interpreter will effect the generation of high-fidelity test cases for a particular
+interpreter will affect the generation of high-fidelity test cases for a particular
 instruction, leading to incomplete coverage of that instruction's implementation
 in Low-Fi emulator.
 %
@@ -104,7 +104,7 @@ formal methods. The efforts along the direction include Soomin
 and Fr\c{e}d\c{e}ric \etal~\cite{inlineassm}.
 %%
 
-MeanDiff~\cite{ASE2017} proposed a N-version IR testing to validate three binary
+MeanDiff~\cite{ASE2017} proposed an N-version IR testing to validate three binary
 lifters, BAP~\cite{BAP:CAV11}, BINSEC~\cite{BINSEC2011}, and PyVEX~\cite{PYVEX}
 by comparing their translation of a single binary instruction to BIL, DBA, and VEX IRs respectively.
 The tools symbolically execute each of the IR instances, lifted from a single
@@ -129,21 +129,24 @@ the functional behavior of the machine code. The decompiler works on top of ISA
 models for IA-32 \cite{Karl2003}, ARM~\cite{Fox2003} and
 PowerPC~\cite{Leroy:2006}. Assuming that the ISA models are trusted, the
 extracted functions can be used to prove properties of the original machine
-code. A recent work by Roessle et al.~\cite{Roessle:CPP19} improves the
+code. However, the work has not been applied to validate the binary translation to an IR.
+A recent work by Roessle et al.~\cite{Roessle:CPP19} improves the
 aforementioned idea  by including a subset of \ISA, derived mostly from
 Strata~\cite{Heule2016a}, in the trust-base of ISA models.   
 
-Leveraging symbolic summaries of source and target programs to prove the
-correctness of  their translation is a well-researched topic. In the context of
-binary translation, for example, MeanDiff~\cite{ASE2017} has demonstrated how
+\todo[inline]{Leveraging symbolic summaries of source and target programs to prove the
+correctness of  compilation/optimization is a well-researched topic. In the context of
+binary translation, MeanDiff~\cite{ASE2017} has demonstrated how
 symbolic summaries can help in N-version equivalence testing of binary
 lifters. However, they compared the summaries corresponding to a single
-instruction at a time. Myreen et al.~\cite{Myreen:FMCAD:2008,Myreen:FMCAD:2012}
+instruction at a time.} 
+
+\cmt{Myreen et al.~\cite{Myreen:FMCAD:2008,Myreen:FMCAD:2012}
 extracted function-level symbolic summaries which indeed is a promising
 building block towards establishing correctness of binary lifters.\cmt{, which, however,  has many additional challenges to deal with (Refer
              Section~\ref{sec:challenges}). Moreover,} However, both Myreen et al. and
          Roessle et al. have limited \ISA instruction set coverage, which
-         might restricts their application on many  real-world binaries.\Comment{Discuss}
+         might restricts their application on many  real-world binaries.}
 
 
 \subsection{Using Machine Learning} Another recent work by Schulte
@@ -165,7 +168,7 @@ smallish binaries. For example, out of $22$ binaries under test, only $4$ achiev
     an end-end byte-equivalent binary to LLVM decompiler using purely genetic
     optimization algorithm. 
 \cmt{only $3$
-    achieve full byte equivalence when the initial population does not includes
+    achieve full byte equivalence when the initial population does not include
     decompiler seeds, and} 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -229,7 +232,7 @@ target program must correspond to branches in the source program.  \cmt{ This
     are specific to the GNU C compiler. 
   
 \cmt{ 
-Another translation validation technique is VOC [11]. We overview VOC for struc-
+Another translation-validation technique is VOC [11]. We overview VOC for struc-
 ture preserving transformations only. Such transformations admit a mapping
 between some program points in P and P'. In VOC a basic block and variable
 correspondence is represented by a mapping from some blocks in P' to some
@@ -248,8 +251,7 @@ trial is performed by scanning the symbol table produced by the compiler [2].
 However, not every compiler provides the symbol table as a result of
 compilation, thus this limits the applicability of VOC-64.}
   
-A quite recent translation validation technique is Rival’s
-technique~\cite{Rival:2004}. The technique provides a unifying framework for
+The translation validation technique by Rival~\cite{Rival:2004} provides a unifying framework for
 the certification of compilation and of compiled programs. Similarly to
 Necula’s technique, the framework is based on a symbolic representation of the
 semantics of the programs. Rival’s technique extracts basic block and variable
@@ -266,11 +268,11 @@ to know what and in which order the transformations are applied by the
 optimizing phase.  
 
 \cmt{ 
-DDEC~\cite{DDEC:OOPSLA:2013} is an data-driven equivalence checker for x86
+DDEC~\cite{DDEC:OOPSLA:2013} is a data-driven equivalence checker for x86
 loops that uses data collected from test runs rather than inference or hints to
 construct a simulation relation. For evaluation, they prove the equivalence of
 code produced by \textsc{COMPCERT}~\cite{CompCert:FM06} and gcc (with
-    otimization enbaled).
+    optimization enabled).
 }
 %DDEC~\cite{DDEC:OOPSLA:2013} uses a combination of static analysis and
 %data-driven inference for constructing simulation relations: Static analysis is
@@ -306,7 +308,7 @@ using binaries compiled using GCC and ICC and labeling each binary program
 point with a particular compiler.
 %
 
-Rosenblum \etal~\cite{Rosenblum:2011} developed authorship attribution
+Rosenblum \etal~\cite{Rosenblum:2011} developed an authorship-attribution
 technique that uses machine learning approach to automatically discover the
 stylistic characteristics of binary code which are indicative of programmer
 style.
@@ -314,7 +316,7 @@ style.
 
 %% Using Formal Methods
 \cmt{ 
-    , and it is non-trivial to achieve the same equivalence using function level summaries.  
+    , and it is non-trivial to achieve the same equivalence using function level summaries, 
     which is less harder problem that proving equivalence between function level summaries.   
     
     Many \TV system makes use of symbolic summaries of source and target programs to validate the translation.
@@ -324,11 +326,8 @@ style.
     which accurately describes the effect of the given machine code and hides
     irrelevant details of the underlying machine language specification. Along
     similar lines,  
-}
 
 
-%%
-\cmt{ 
     Fr\c{e}d\c{e}ric \etal~\cite{inlineassm} addresses the challenge of designing and developing an
     automated, generic, trustable, and verification-oriented lifting technique
     turning inline assembly into semantically equivalent C code. By focusing on

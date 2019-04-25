@@ -37,7 +37,6 @@ That is, the processor is free to choose any behavior in the undefined case.
 
 
 Many existing semantics, however, simply ``define'' the undefined behaviors by
-% consulting with an actual processor implementation.
 following a specific behavior taken by a processor implementation.
 This approach is problematic because they do not capture all possible behaviors of different processor implementations.
 Indeed, we found discrepancies between existing semantics in specifying the undefined behaviors, where different semantics are valid only for different groups of processors.
@@ -45,7 +44,7 @@ That is, such semantics are not adequate to formally reason about universal prop
 %
 For example, the parity flag \reg{pf} is undefined in the logical-and-not instruction \instr{andn}, where the processor implementation is allowed to either update the flag value (to 0 or 1), or keep the previous value.
 We found, e.g., that Remill~\cite{Remill} updates the flag with 0, whereas Radare~\cite{Radare2} keeps it unmodified.
-Identifying and faithfully specifying all of the undefined behaviors, thus, are desirable but challenging.
+Identifying and faithfully specifying all the undefined behaviors, thus, are desirable but challenging.
 
 \SC{In our semantics, we faithfully modeled the undefined value as a unique symbol (called \s{undef}) whose value is nondeterministically decided each time within the proper range.}
 These nondeterministic values are enough to capture and formally reason about all possible behaviors of the instructions for different processors (and even any future, standard-conforming processor).

@@ -53,8 +53,8 @@ One of the long standing challenge, which deters many previous efforts like
 lifters, is the lack of formal specification of the \ISA instructions
 specifying binary program. \ISA instruction are massive in both numbers and
 complexity and are specified in an informal manner in the Intel
-manual~\cite{IntelManual} worth over $3,800$ pages. The \ISA ISA has a large
-number of instructions, partly because of a large number of complex
+manual~\cite{IntelManual} worth over $3,800$ pages. The \ISA ISA is huge
+, partly because of a large number of complex
   instructions and partly because it keeps most of the legacy and deprecated
   instructions ($~336$+) for the sake of backwards compatibility. It consists
   of $996$ mnemonics, and each mnemonic admits several variants, depending on
@@ -83,7 +83,7 @@ compilation~\cite{VOC2002,TVOC:CAV2005,Necula:2000,Sewell:2013,Kundu:2009,Kedar:
     decompilers like
     McSema~\cite{McSema:Recon14},llvm-mctoll~\cite{llvm-mctoll} and
     reopt~\cite{reopt} performs analysis and optimization on top of the
-    decompiled IR so as to identity function prototypes, types and variables.
+    decompiled IR to identity function prototypes, types and variables.
     Naive approaches, like identifying and/or pruning glue code added during
     decompilation or to make the equivalence checker aware of the optimizations
     performed by the decompiler, might work for a specific decompiler but,
@@ -98,7 +98,7 @@ Intuitively, the proofs, using an equivalence checker,  will try to establish
 equivalence between synchronization points which are symbolic descriptions that
 capture the set of pairs of relevant states of the input and output programs.
 One of the essential requirements of the equivalence checker,  in the context
-of binary lifting, is language independence, so as  to proof equivalence
+of binary lifting, is language independence, to proof equivalence
 between programs in different languages (like \ISA and LLVM). \cmt{Moreover, the
 proof generator has to take into account the specifics of the translation which
 could be achieved by using translator-generated hints or heuristics inspired by
@@ -127,7 +127,7 @@ the lifted LLVM IR code, we decided to build on K~\cite{k-primer-2013-v32}.
         applicability of the semantics and engineering the semantics itself.
     
 
-In formal methods literature, the notion of program (or semantic) equivalence
+In formal-method's literature, the notion of program (or semantic) equivalence
 is usually formalized as a bi-simulation relation~\cite{Sangiorgi:2011} between
 pairs of states of the two programs.
 Ideally, we want a bi-simulation variant that allows us to simply relate the

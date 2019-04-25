@@ -19,7 +19,7 @@ instrumentation
                  Binary analysis is generally performed by various decompiler
                  projects
                  ~\cite{McSema:Recon14,Remill,Angr1,BAP:CAV11,Radare2}, whose
-                 very first step is to translate the machine code to a
+                 very first step is to translate the machine code to an
                  intermediate representation (IR), and thereby exposing many
                  high-level properties (like control flow, function boundary
                      and prototype, variable and their type etc.) of the
@@ -82,7 +82,8 @@ Below we propose the  primary contributions of our work.
 \textbf{\emph{Translation validation on binary translators~}} We propose tools and
 techniques to formally validate the translation from binary to high level IR.
 To the best of our knowledge, we are the first to propose \tv to establish the
-faithfulness of binary lifters targeting LLVM as their high-level IR. We would demonstrate the applicability of our approach by validating the translation of a realistic decompiler, McSema~\cite{McSema:Recon14}\cmt{  and revng~\cite{DiFederico:CC2017}}.
+faithfulness of binary lifters targeting LLVM as their high-level IR. We would demonstrate the applicability of our approach by validating the translation of a realistic decompiler, McSema~\cite{McSema:Recon14}.
+%and revng~\cite{DiFederico:CC2017}}.
 
 \textbf{\emph{Most Complete user-level \ISA Semantics:}} Towards the goals of \tv of binary translators, we developed\cite{DasguptaAdve:PLDI19} the most complete and thoroughly tested formal
 semantics of \ISA to date, which faithfully formalizes all the non-deprecated, sequential user-level instructions of the x86-64 Haswell instruction set architecture. 
