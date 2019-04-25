@@ -1,7 +1,7 @@
 \chapter{Related Work}\label{sec:related-work}
 
-Given the importance in establishing the faithfulness of the binary lifters,
-      there has been a couple of efforts towards that direction, which we will elaborate next.
+Given the importance of establishing the faithfulness of the binary lifters,
+      there exits a couple of efforts towards that direction, which we will elaborate on next.
 
 \section{Recent Advances in Validation of Decompilation}\label{sec:recent-advances}
 All the previous approaches can be broadly categorized to be based on (1)
@@ -26,12 +26,12 @@ deviations.
 Although, a simple and scalable approach, it's effectiveness is limited because
 many semantics bugs in binary lifters are triggered upon a specific input and
 exercising all such corner inputs, using randomly generated test-cases, is
-non-trivial.
+impractical.
 %%
 
 Chen \etal~\cite{CLSS2015} proposed validating the static binary translator
-LLBT~\cite{LLBT2012} and the hybid binary translator~\cite{LLVMDBT2012},
-  translating ARM programs to x86 programs using the LLVM x86 backed. First, an
+LLBT~\cite{LLBT2012} and the hybrid binary translator~\cite{LLVMDBT2012},
+  translating ARM programs to x86 programs using the LLVM x86 backend. First, an
   ARM program is translated offline to x86 program. Next, the translated x86
   binary is executed  directly on an x86 system while the original ARM binary runs on the QEMU emulator. During run time, both the ARM binary and the
   translated x86 binary produce a sequence of  architecture states, which are
@@ -55,7 +55,7 @@ being a differential testing-based approach, the faithfulness depends directly
 on  the faithfulness of the Hi-Fi emulator. A wrong implementation (or even
     omission of a particular case) of instruction semantics in the Hi-Fi, will
 lead to test-cases insufficient to explore all the paths and hence find bugs in
-the Low-Fi emulator. 
+the Low-Fi emulator\footnote{We note that our proposed semantics-driven \tv approach shares similar assumptions about the faithfulness of the semantics.}. 
 %
 Moreover, the symbolic execution of an instruction's implementation in the
 Hi-Fi emulator is achieved using an X86 interpreter FuzzBALL. A bug in the
@@ -99,7 +99,7 @@ in Low-Fi emulator.
 
 \subsection{Using Formal Methods}
 Another direction to establish strong guarantees in the binary translation is by using
-formal methods. The most notable efforts along the direction are that of Soomin
+formal methods. The efforts along the direction include Soomin
 \etal~\cite{ASE2017}, Myreen et al.~\cite{Myreen:FMCAD:2008,Myreen:FMCAD:2012}
 and Fr\c{e}d\c{e}ric \etal~\cite{inlineassm}.
 %%
@@ -136,14 +136,14 @@ Strata~\cite{Heule2016a}, in the trust-base of ISA models.
 Leveraging symbolic summaries of source and target programs to prove the
 correctness of  their translation is a well-researched topic. In the context of
 binary translation, for example, MeanDiff~\cite{ASE2017} has demonstrated how
-symbolic summaries can be help in N-version equivalence testing of binary
+symbolic summaries can help in N-version equivalence testing of binary
 lifters. However, they compared the summaries corresponding to a single
 instruction at a time. Myreen et al.~\cite{Myreen:FMCAD:2008,Myreen:FMCAD:2012}
 extracted function-level symbolic summaries which indeed is a promising
 building block towards establishing correctness of binary lifters.\cmt{, which, however,  has many additional challenges to deal with (Refer
              Section~\ref{sec:challenges}). Moreover,} However, both Myreen et al. and
          Roessle et al. have limited \ISA instruction set coverage, which
-         might restricts their application on many  real-world binaries.
+         might restricts their application on many  real-world binaries.\Comment{Discuss}
 
 
 \subsection{Using Machine Learning} Another recent work by Schulte
@@ -175,18 +175,6 @@ include Equivalence checking, \TV, and Software Verification, and Machine Learni
 
 \section{Translation Validation}
 
-Hawblitzel et al.~\cite{Hawblitzel:FSE2013} use a \tv approach to determine
-whether assembly code produced by different versions of the CLR JIT compiler
-are semantically equivalent and thus report mis-compilations when there are
-differences. The versions include those across a seven-month time period,
-  across two architectures (x86 and ARM), and across optimizations levels. The
-  underlying validator encodes each assembly method body into a procedure in
-  the Boogie~\cite{Boogie:2005}  programming language and then invokes the
-  SymDiff symbolic differencing tool~\cite{SYMDIFF:2012} to compare the Boogie
-  encodings for semantic equivalence. For code with loops, the validator simply
-  eliminates loops by unrolling them n (= 2) times, ignoring any behaviors past
-  the n$^{th}$ iteration.
- 
 Pnueli \etal~\cite{Pnueli:1998} proposed the idea of \tv as a new approach to
 the verification of translators (compilers, code generators). The idea is:
 Rather than verifying the compiler itself, one constructs a validation tool
@@ -199,6 +187,20 @@ the well-established concept of simulation with refinement
 mapping~\cite{Abadi:1991}. Refinement mappings define a correspondence between
 the variables of a concrete system and the variables of an abstract system such
 that observations are preserved. 
+
+Hawblitzel et al.~\cite{Hawblitzel:FSE2013} use a \tv approach to determine
+whether assembly code produced by different versions of the CLR JIT compiler
+are semantically equivalent and thus report mis-compilations when there are
+differences. The versions include those across a seven-month time period,
+  across two architectures (x86 and ARM), and across optimizations levels. The
+  underlying validator encodes each assembly method body into a procedure in
+  the Boogie~\cite{Boogie:2005}  programming language and then invokes the
+  SymDiff symbolic differencing tool~\cite{SYMDIFF:2012} to compare the Boogie
+  encodings for semantic equivalence. For code with loops, the validator simply
+  eliminates loops by unrolling them n (= 2) times, ignoring any behaviors past
+  the n$^{th}$ iteration.
+ 
+
 
 Translation validation  has been employed heavily in the field of compiler
 correctness~\cite{VOC2002,TVOC:CAV2005,Necula:2000}.  Necula~\cite{Necula:2000}
@@ -280,14 +282,20 @@ code produced by \textsc{COMPCERT}~\cite{CompCert:FM06} and gcc (with
 
 \section{Machine Learning-Assisted Binary Code Analysis}\label{sec:ml}
 
+Hasabnis \etal~\cite{Hasabnis:ASPLOS16, Hasabnis:FSE16} presents the semantics of \ISA using machine learning~\cite{Hasabnis:ASPLOS16} and symbolic 
+execution~\cite{Hasabnis:FSE16} to automatically learn the translation of \ISA instructions to their IR, by extracting knowledge from the hard-coded  translation logic of compilers such as GCC.
+However, as they admitted~\cite{Hasabnis:FSE16}, their semantics omits some important details of \ISA semantics (e.g., the effect of various instructions on CPU flags).
+
+
 Jaffe \etal~\cite{Jaffe:2018ICPC} proposes a technique to assign meaningful
 variable names to Hex-ray~\cite{hexray} decompiled C code by learning names
 that developers have assigned to code used in similar contexts. The technique
 aligns the variables in the decompiler output with those in the original C code
 in order to generate an aligned parallel corpus that is suitable for training a
-Statistical Machine Translation (SMT) model~\cite{Koehn:2007}.  
+Statistical Machine Translation model~\cite{Koehn:2007}.  
 
-Rosenblum \etal~\cite{Rosenblum2007,Rosenblum:2008,Bao:2014,Shin:2015} consider
+Rosenblum \etal~\cite{Rosenblum2007,Rosenblum:2008}%,Bao:2014,Shin:2015 
+consider
 the machine learning problem of identifying function entry points in binaries
 where symbols indicating function location are stripped.
 %

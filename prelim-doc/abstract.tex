@@ -25,9 +25,8 @@ with minimal effort.
 Formally establishing faithfulness of the decompilation (i.e. translation from
     machine code to high level IR) is pivotal to gain trust in any binary
 analysis and, to the best of our knowledge, there is no exiting work to
-formally validate the translation of binary to LLVM IR.(Refer to the related
-    work at Section~\ref{sec:related-work}).  We believe an effort in the
-direction would benefit existing LLVM based binary analyzers.
+formally validate the translation of binary to a high-level IR\Comment{discuss}.  We believe an effort in the
+direction would empower the developers of binary translators to validate their tool.
 
 The goal of our work is to formally validate such translation by leveraging the
 semantics of the languages involved (e.g. the Intel's X86-64 and LLVM IR). Some
@@ -41,13 +40,13 @@ ISA~\cite{DasguptaAdve:PLDI19}. Moreover, the semantics of a subset of LLVM IR
 is already available~\cite{LLVMSEMA} for us to leverage and build on.
 
 Given the recent advances in translation validation in validating compilation,
-      a basic version of this strategy is likely quite feasible today, however,
+      employing \tv to validate binary translators seems a promising direction to explore, however,
       there are additional challenges to deal with when it comes to validating
       the decompilation pipeline, like finding function, basic block and
       variable correspondence for checking equivalence, identifying and pruning
       glue code added during decompilation, to make the equivalence checker
       aware of the optimizations performed by the decompiler (e.g.  recovering
-          prototype and variables). We would like validation approach to be
+          prototype and variables). Moreover, we would like validation approach to be
       general enough and hence applicable to any state-of-the-art binary to
       LLVM IR translators~\cite{McSema:Recon14,Remill,FCD,reopt,llvm-mctoll},
       thereby avoiding any translator specific customization during validation.

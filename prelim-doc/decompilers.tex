@@ -38,21 +38,23 @@
     
     \item Analyzing stripped binary executables, i.e., binaries without symbol
     or debugging information, enables software analysis without access to
-    source code. Such scenarioes arises in the case of (1) legacy code, when
+    source code. Such scenarios arises in the case of (1) legacy code, when
     binary analysis is the only viable option to re-implement (or patch) the
     program, or (2) malwares, when binary analysis helps in security audits or
     malware
     detection~\cite{Christodorescu:2005,Andreas2007,Kinder:2005,Kinder:2010,Kolbitsch:2009}.
     
-    \item There are challenges that the source code based analysis tools has to
-    face  in dealing with the code written in different feature-rich high-level
-    languages, for example, parsing support for  the high-level constructs.
-    Moreover, while analyzing source code, the libraries are often replaced by
+    \item 
+    %There are challenges that the source code based analysis tools have to
+    %face  in dealing with the code written in different feature-rich high-level
+    %languages, for example, parsing support for  the high-level constructs.
+    %Moreover, 
+    While analyzing source code, the libraries are often replaced by
     coarse grained abstractions~\cite{libabs}. Operating on the binary avoids
     these issues altogether, since all source languages are translated into a
     hardware specific, but single target language with no distinction between
     the source code or library code. \cmt{However, a common workaround for
-      these problems, which already in common practice, is to preprocess input
+      these problems, which already in common practice, is to pre-process input
         files into a simpler intermediate form which is amenable for analysis.
         For example, for languages that are compiled to an intermediate form,
             such as Java bytecode, Microsoft's Common Intermediate Language
@@ -64,7 +66,7 @@
     \item Even when the source code is available, doing analysis at the binary
     level alleviates the need to trust the correctness of the compiler.
     Moreover, during the compilation process, the source code undergoes many
-    modification, removal or additions, before translated to binary and
+    modifications, removal or additions, before translated to binary and
     analyzing that binary is desirable because it is what is actually executed on
     hardware~\cite{WYSINWYE}. 
     
@@ -99,21 +101,21 @@ impressive amount of work to rebuild a close approximation of the high-level
 source code from a compiled binary using various decompilation
 frameworks~\cite{McSema:Recon14,Remill,Angr1,BAP:CAV11,Radare2,FCD,BitBlaze:2008,hexray,Fokin:2011,eschulte2018bed,katz2018rnn,Schwartz:2013,IDA,mctoll,revgen}.
 
-Binary analysis using a decompilation framework is achieved by (1) Translating machine code to a intermediate
+Binary analysis using a decompilation framework is achieved by (1) Translating machine code to an intermediate
 representation (IR), which precisely represents the operational semantics of
 the binary code. The lifted IR exposes many high-level properties (like control
-    flow, function boundary and prototype, variable and their type etc.) of the
+    flow, function boundaries and prototypes, variables and their types etc.) of the
 the binary, which are otherwise lost during the compilation pipeline, and (2)
   performing the analysis at the IR level.  Analyzing the binary using the
-  abstractions lifted to such high-level IR assist further analysis and/or
+  abstractions lifted to such high-level IR assists further analysis and/or
   optimization. 
   %We note that the IR, being the basis for any binary analysis techniques, the
   %faithfulness of the lifting or decompilation process is highly desirable. 
 
-Binary analyzes are mostly agnostic to any specific high-level IR, but many
+Binary analysis is mostly agnostic to any specific high-level IR, but many
 projects~\cite{McSema:Recon14,Remill,FCD,reopt,mctoll} prefer to employ LLVM
 IR~\cite{Lattner:2004}. LLVM IR, being an industry standard compiler IR,
   enables many analyses and optimizations out-of-the-box which allows building
-  a static binary analyzer with minimal effort.
+  a static binary analyzer with minimal effort. For these reasons, we focus on decompilers to LLVM IR, but we believe that the core techniques are applicable to other decompilers targeting mid-level (language-neutral) IRs.   
 
 %\Comment{Explain the output of some of the Decompilers and discuss the lifting choices they make}

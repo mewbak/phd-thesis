@@ -20,17 +20,16 @@ follows:
     translation from binary to high level IR}
 
 Specifically, we would like to validate the translation from \ISA binary
-program  to high level LLVM~\cite{LLVM:CGO04} IR considering the translator as
-a black-box, thereby, applying the techniques to multiple state-of-art binary
-lifters/translators. This is in contrast with  verifying the
+program  to high level LLVM~\cite{LLVM:CGO04} IR. This is in contrast with  verifying the
 translator\footnote{Translator verification uses a theorem prover or proof
-  assistant to verify a translator correct, once and for all, so that all
+    assistant to verify a translator correct, once and for all, so that all
     translator output is guaranteed correct for all valid source programs.
     Translation validation, on the other hand, runs a theorem prover after each
     translation to check that the output of the translator is semantically
     equivalent to the source program.}, as in  compiler
-    verification~\cite{Leroy:2009}, which is not only more involving but is
-    specific to individual translators.
+verification~\cite{Leroy:2009}, which is not only more involving but is
+specific to individual translators. Whereas, \tv allows us to apply the technique to multiple state-of-art binary
+lifters/translators. 
 
 Next, we will discuss challenges in the proposed work (Section
     ~\ref{sec:challenges}) and the detailed steps (Section~\ref{sec:approach})
@@ -150,7 +149,7 @@ language semantics. The algorithm employs the notion of cut-bisimulation,
          provided  as an input to the algorithm. Keq is robust enough to apply to the Instruction Selection (ISel) phase of LLVM to validate the translation from LLVM IR to the output of the ISel phase, called Virtual x86. 
   
  % X86
- The \m{Keq} tool, being parametric on the semantics of the input/output languages, need to be provided the semantics of LLVM and \ISA as inputs. Given the size and the complicity of the \ISA specification, providing the \ISA semantics is a non-trivial task which deters many previous efforts from using semantics driven approach to validate the binary translation. We are the first to develop 
+ The \m{Keq} tool, being parametric on the semantics of the input/output languages, need to be provided the semantics of LLVM and \ISA as inputs. Given the size and the complexity of the \ISA specification, providing the \ISA semantics is a non-trivial task which deters many previous efforts from using semantics driven approach to validate the binary translation. We are the first to develop 
  the most complete and thoroughly tested formal
  semantics of \ISA to date (Refer Section~\ref{sec:results}). Our semantics faithfully formalizes all the non-deprecated, sequential user-level instructions
  of the x86-64 Haswell instruction set architecture. This totals
