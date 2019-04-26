@@ -120,6 +120,14 @@ cannot guarantee that all the lifters are faithful in lifting that instruction,
        together, hence it cannot be used to establish the faithfulness in
        lifting the semantics of an instruction which is not implemented in any one
        of them.
+       %
+       \cmt{ 
+       Leveraging symbolic summaries of source and target programs to prove the
+       correctness of  compilation/optimization is a well-researched topic. In the context of
+       binary translation, MeanDiff~\cite{ASE2017} has demonstrated how
+       symbolic summaries can help in N-version equivalence testing of binary
+       lifters. However, they compared the summaries corresponding to a single
+       instruction at a time.}
 %%
 
 Myreen et al.~\cite{Myreen:FMCAD:2008,Myreen:FMCAD:2012} proposed
@@ -134,12 +142,7 @@ A recent work by Roessle et al.~\cite{Roessle:CPP19} improves the
 aforementioned idea  by including a subset of \ISA, derived mostly from
 Strata~\cite{Heule2016a}, in the trust-base of ISA models.   
 
-\todo[inline]{Leveraging symbolic summaries of source and target programs to prove the
-correctness of  compilation/optimization is a well-researched topic. In the context of
-binary translation, MeanDiff~\cite{ASE2017} has demonstrated how
-symbolic summaries can help in N-version equivalence testing of binary
-lifters. However, they compared the summaries corresponding to a single
-instruction at a time.} 
+
 
 \cmt{Myreen et al.~\cite{Myreen:FMCAD:2008,Myreen:FMCAD:2012}
 extracted function-level symbolic summaries which indeed is a promising

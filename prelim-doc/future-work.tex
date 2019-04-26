@@ -1,5 +1,5 @@
 \chapter{Ongoing and Future Work: Translator-agnostic Translation
-  Validation}\label{sec:future}\todo{The entire chapter is revised}
+  Validation}\label{sec:future}
 
 With the overall goal of  establishing faithfulness of binary lifters, we
 propose to use \tv to validate the translation from binary to LLVM IR\footnote{However, we believe that the core techniques are
@@ -74,8 +74,8 @@ of their technique is interpretation of the two programs on random inputs and
 comparing the histories of value changes for variables.  If the sequences of
 value changes of two variables are the same, then the variables probably
 correspond to each other, and the block in which the changes occur might also
-correspond to each other. However, as the paper do not consider  generation of
-verification invariants  at each point of correspondence, hence it is difficult
+correspond to each other. However, the paper candidly admits that they do not consider  generation of
+verification invariants (VCs) at a point of correspondence or proving the VCs, hence it is difficult
 to judge  its effectiveness in proving the equivalence of the candidate RTL
 programs.  \cmt{ Moreover, the paper do not try to address any reordering
   transformation, that is any transformation that changes the order of
@@ -96,8 +96,8 @@ programs.  \cmt{ Moreover, the paper do not try to address any reordering
 
 Rahul \etal~\cite{DDEC:OOPSLA:2013} presented ``data-driven equivalence
 checker'' (DDEC) to check equivalence of two x86 loops which uses data-driven
-inference in order to guess candidate simulation relations\footnote{A
-  simulation relation consist of pair of program cutpoints, which breaks two
+inference in order to guess candidate simulation relations\footnote{A 
+  simulation relation can be roughly defined to consist of a pair of program cutpoints, which breaks two
     loops into a set of pairs of loop-free code fragments and  linear
     equalities as invariants to hold at those cutpoints.}. Their approach does
     not assume any knowledge about the optimization performed while determining
@@ -118,18 +118,25 @@ inference in order to guess candidate simulation relations\footnote{A
               failure reason seems non-trivial and could affect fully automatic
               application of the approach.}   
 
+%Our proposed approach is based on the insight that a sound guess of
+%synchronization points do not result in proving two programs equivalent when
+%they are not (false positives). Indeed, they might produce false negatives.
+%Having said that, 
 
-
-Our proposed approach is based on the insight that a sound guess of
-synchronization points do not result in proving two programs equivalent when
-they are not (false positives). Indeed, they might produce false negatives.
-Having said that, given  \ISA and translated LLVM programs, we might compile
+Our proposed approach is based on the insight that
+given  \ISA and translated LLVM programs, we might compile
 the LLVM program to binary and use the data-driven
 approach~\cite{DDEC:OOPSLA:2013}, mentioned above, to extract guesses of
-\syncps. However, we do not want to add the compilation in our trust base and
-hence we can map the \syncps back to the IR level and employ the equivalence
-checker \m{Keq} to proof the equivalence of the resulting LLVM IR and the
-original binary using the \syncp guesses. However, these \syncp, being
+\syncps. Next, we can map the \syncps back to the IR level and employ the equivalence
+checker \m{Keq} to prove the equivalence of the resulting LLVM IR and the
+original binary using the \syncp guesses. We note that, an incorrectly guessed, but sound \syncp will never result in proving two programs equivalent when
+they are not (false positives) and hence we do not have to trust the compilation back-end.
+
+%However, we do not want to add the compilation in our trust base and
+%hence we can map the \syncps back to the IR level and employ the equivalence
+%checker \m{Keq} to prove the equivalence of the resulting LLVM IR and the
+%original binary using the \syncp guesses. 
+However, these \syncp, being
 data-driven guesses, may lead to failing the proof obligations for reasons
 other than a translation error. For example, the proof might fail if the
 spurious invariants are generated or the \syncps are not sufficient, and it is
@@ -142,7 +149,7 @@ to trivial and automatic attribution of proof failure reason. On the other
 hand, the \syncp guesses produced by the  translator-agnostic proof generator
 has issues with automatic attribution  of the failure reasons. We envision
 opportunities to exploit this trade-off by pruning off \syncp  guesses which a
-translator specific proof generator will never generate. \todo[inline]{For
+translator specific proof generator will never generate. For
   example, the equivalence checker \m{Keq}~\cite{TheoSAS19} is used for
     validating the compilation pipeline and it uses compiler generated hints to
     prove equivalence. The underlying algorithm mandates three
@@ -153,7 +160,7 @@ to prove equivalence, viz., entry points, exiting points (which also include
     points before callsites), and the rest of the points (including loop entry
       points and points after callsites). We may use this information to prune
     redundant \syncp guesses generated by a translator-agnostic  proof
-    generator like DDEC~\cite{DDEC:OOPSLA:2013}.}
+    generator like DDEC~\cite{DDEC:OOPSLA:2013}.
 
 \paragraph{\textbf{Learning \syncps}}
 
@@ -169,7 +176,7 @@ output.
 %
 
 The employed model is  a sequence-to-sequence model based on RNNs. The model
-composed of a two recurrent neural networks: an encoder, which processes the
+composed of two recurrent neural networks: an encoder, which processes the
 input binary sequence, and a decoder, which creates outputs, the decompiled C
 code. Further, the sequence-to-sequence model contains a hidden state, which
 summarizes the entire input sequence. 
@@ -211,4 +218,4 @@ on each selection. For example, for each selection of \syncp, a \emph{reward}
 can be assigned using the number of values on which the corresponding memory
 states agree on, when they are both tested using a random set of same  inputs.
 
-We believe such learning techniques are promising for this problem and we would like to explore more on this in future.
+We believe such learning techniques are promising for this problem and we would like to explore more on this.
